@@ -14,7 +14,6 @@
     <modules>
         <module>stat-service-parent</module>
         <module>explore-with-me-service</module>
-
     </modules>
 
     <groupId>ru.practicum</groupId>
@@ -38,6 +37,22 @@
     <build>
         <pluginManagement>
             <plugins>
+
+<!--                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.4.1</version> &lt;!&ndash; Используйте последнюю доступную версию &ndash;&gt;
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                                <classpathPrefix>lib/</classpathPrefix>
+                                <mainClass>ru.practicum.statistica.StatisticApplication</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>-->
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
