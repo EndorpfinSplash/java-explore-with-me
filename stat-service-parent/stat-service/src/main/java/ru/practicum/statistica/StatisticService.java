@@ -22,11 +22,22 @@ public class StatisticService {
     }
 
 
-
     public List<EventStatisticByEventDto> getEventStatistic(LocalDateTime start,
                                                             LocalDateTime end,
                                                             List<String> uris,
                                                             boolean unique) {
-        return  statisticRepository.countEvents(start, end, uris);
+        if ((uris == null || uris.isEmpty()) && !unique) {
+            return statisticRepository.countEvents(start, end);
+        }
+
+        if (uris == null || uris.isEmpty()) {
+            return statisticRepository.countUniqIpForEvents(start, end);
+        }
+
+        if (unique) {
+            return statisticRepository.countUniqIpForEvents(start, end, uris);
+        }
+
+        return statisticRepository.countEvents(start, end, uris);
     }
 }
