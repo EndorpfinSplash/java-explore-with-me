@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>stat-client-service</module>
-        <module>common-dto</module>
+        <module>stat-common-dto</module>
         <module>stat-service</module>
     </modules>
 
@@ -22,5 +22,13 @@
 <!--        <maven.compiler.target>11</maven.compiler.target>-->
 <!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
 <!--    </properties>-->
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 
 </project>
