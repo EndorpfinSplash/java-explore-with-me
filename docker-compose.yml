@@ -28,7 +28,6 @@ services:
      - POSTGRES_PASSWORD=12345
 
 
-
   ewm-service:
     build: ./explore-with-me-service
     hostname: ewm-service
