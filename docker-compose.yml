@@ -36,7 +36,6 @@ services:
       - "8080:8080"
     depends_on:
       - ewm-db
-      - stats-server
     environment:
       - SERVER_PORT=8080
       - SERVER_URL=http://ewm-service:8080
