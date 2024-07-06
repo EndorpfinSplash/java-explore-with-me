@@ -1,15 +1,57 @@
-version: '3.1'
 services:
   stats-server:
+    build: ./stat-service-parent/stat-service
+    hostname: stat-service
+    container_name: container_1_statistic_service
     ports:
       - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - SERVER_PORT=9090
+      - SERVER_URL=http://stat-service:9090
+    restart: on-failure
+
 
   stats-db:
-    image: postgres:14-alpine
+   image: postgres:16.1
+   container_name: container_0_stats_db
+   hostname: stats-db
+   volumes:
+     - /var/lib/postgresql/data/
+   ports:
+     - "6541:5432"
+   environment:
+     - TIME_ZONE=Europe/Minsk
+     - POSTGRES_DB=statistic
+     - POSTGRES_USER=dbuser
+     - POSTGRES_PASSWORD=12345
+
+
 
   ewm-service:
+    build: ./explore-with-me-service
+    hostname: ewm-service
+    container_name: container_3_ewm_service
     ports:
       - "8080:8080"
+    depends_on:
+      - ewm-db
+    environment:
+      - SERVER_PORT=8080
+      - SERVER_URL=http://ewm-service:8080
+    restart: on-failure
 
   ewm-db:
-    image: postgres:14-alpine
+    image: postgres:16.1
+    container_name: container_2_ewm_db
+    hostname: ewm-db
+    volumes:
+      - /var/lib/postgresql/data/
+    ports:
+      - "6542:5433"
+    environment:
+      - TIME_ZONE=Europe/Minsk
+      - POSTGRES_DB=ewm
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=12345
