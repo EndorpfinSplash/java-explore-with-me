@@ -13,10 +13,10 @@ import java.util.List;
 public interface StatisticRepository extends JpaRepository<Event, Long> {
 
     @Query("select new ru.practicum.commons.EventStatisticByEventDto( e.app, e.uri, count(*))" +
-            "from Event as e "+
-            "where e.timestamp between ?1 and ?2"+
+            "from Event as e " +
+            "where e.timestamp between ?1 and ?2" +
             "and e.uri in (?3)" +
-            "group by e.app, e.uri "+
+            "group by e.app, e.uri " +
             "order by count(*) desc")
     List<EventStatisticByEventDto> countEvents(LocalDateTime from, LocalDateTime to, List<String> uriList);
 }
