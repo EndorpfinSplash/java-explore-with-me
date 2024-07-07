@@ -25,7 +25,9 @@ public class StatisticController {
     public EventOutDto hit(
             @RequestBody @Valid EventCreationDto eventCreationDto) {
         log.info("Collect data about event {}", eventCreationDto);
-        return statisticService.save(eventCreationDto);
+        EventOutDto savedEvent = statisticService.save(eventCreationDto);
+        log.info("Event {} was saved", savedEvent);
+        return savedEvent;
     }
 
     @GetMapping("/stats")
@@ -42,7 +44,9 @@ public class StatisticController {
     ) {
         log.info("Get events from {} to end {} for list of URIs[{}] with unique flag {}",
                 start, end, Collections.singletonList(uris), unique);
-        return statisticService.getEventStatistic(start, end, uris, unique);
+        List<EventStatisticOutDto> eventStatistic = statisticService.getEventStatistic(start, end, uris, unique);
+        log.info("Event statistic calculated: {} ", eventStatistic);
+        return eventStatistic;
     }
 
 }
