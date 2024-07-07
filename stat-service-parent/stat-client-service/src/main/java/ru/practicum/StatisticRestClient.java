@@ -18,11 +18,10 @@ public class StatisticRestClient {
     @Value("${host}")
     private String host;
 
-    private String REQUEST_URI;
     private final RestTemplate restTemplate = new RestTemplate();
 
     public ResponseEntity<EventOutDto> sendData(EventCreationDto eventCreationDto) {
-        this.REQUEST_URI = host + ":" + port + RESOURCE_PATH;
+        String REQUEST_URI = host + ":" + port + RESOURCE_PATH;
         return restTemplate.postForEntity(REQUEST_URI,
                 eventCreationDto,
                 EventOutDto.class);
