@@ -6,11 +6,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.commons.EventCreationDto;
 import ru.practicum.commons.EventOutDto;
+import ru.practicum.commons.EventStatisticOutDto;
+
+import java.util.List;
 
 @Slf4j
 public class StatisticRestClient {
 
-    private static final String RESOURCE_PATH = "/hit";
+    private static final String RESOURCE_PATH_TO_SAVE_EVENT = "/hit";
+    private static final String RESOURCE_PATH_TO_GET_STATISTIC = "/stats";
 
     @Value("${server.port}")
     private int port;
@@ -21,10 +25,15 @@ public class StatisticRestClient {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public ResponseEntity<EventOutDto> sendData(EventCreationDto eventCreationDto) {
-        String REQUEST_URI = host + ":" + port + RESOURCE_PATH;
-        return restTemplate.postForEntity(REQUEST_URI,
+        String requestUri = host + ":" + port + RESOURCE_PATH_TO_SAVE_EVENT;
+        return restTemplate.postForEntity(requestUri,
                 eventCreationDto,
                 EventOutDto.class);
+    }
+
+    public ResponseEntity<List<EventStatisticOutDto>> getData() {
+        String requestUri = host + ":" + port + RESOURCE_PATH_TO_GET_STATISTIC;
+        return null;
     }
 
 }
