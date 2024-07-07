@@ -8,7 +8,7 @@ import ru.practicum.commons.EventCreationDto;
 import ru.practicum.commons.EventOutDto;
 import ru.practicum.commons.EventStatisticOutDto;
 
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 public class StatisticRestClient {
@@ -24,16 +24,28 @@ public class StatisticRestClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public ResponseEntity<EventOutDto> sendData(EventCreationDto eventCreationDto) {
+    public EventOutDto sendData(EventCreationDto eventCreationDto) {
         String requestUri = host + ":" + port + RESOURCE_PATH_TO_SAVE_EVENT;
         return restTemplate.postForEntity(requestUri,
-                eventCreationDto,
-                EventOutDto.class);
+                        eventCreationDto,
+                        EventOutDto.class)
+                .getBody();
     }
 
-    public ResponseEntity<List<EventStatisticOutDto>> getData() {
+    public List<EventStatisticOutDto> getData(String start, String end, String uris, String unique) {
         String requestUri = host + ":" + port + RESOURCE_PATH_TO_GET_STATISTIC;
-        return null;
+
+        Map<String, String> urlParameters = new HashMap<>();
+        urlParameters.put("start", start);
+        urlParameters.put("end", end);
+        urlParameters.put("uris", uris);
+        urlParameters.put("unique", unique);
+
+        ResponseEntity<EventStatisticOutDto[]> events = restTemplate.getForEntity(requestUri,
+                EventStatisticOutDto[].class,
+                urlParameters);
+        return events.getBody() != null ? Arrays.asList(events.getBody()) :
+                Collections.emptyList();
     }
 
 }
