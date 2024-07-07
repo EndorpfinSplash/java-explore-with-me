@@ -21,7 +21,6 @@ public class StatisticService {
         return EventMapper.eventToEventOutDto(eventForSave);
     }
 
-
     public List<EventStatisticByEventDto> getEventStatistic(LocalDateTime start,
                                                             LocalDateTime end,
                                                             List<String> uris,
