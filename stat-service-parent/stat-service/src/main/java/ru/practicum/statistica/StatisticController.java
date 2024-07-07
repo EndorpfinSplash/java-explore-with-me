@@ -6,7 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.commons.EventCreationDto;
 import ru.practicum.commons.EventOutDto;
-import ru.practicum.commons.EventStatisticByEventDto;
+import ru.practicum.commons.EventStatisticOutDto;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -29,7 +29,7 @@ public class StatisticController {
     }
 
     @GetMapping("/stats")
-    public List<EventStatisticByEventDto> getStats(
+    public List<EventStatisticOutDto> getStats(
 
             @RequestParam(name = "start")
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventStatisticByEventDto {
-    String app;
-    String uri;
-    Long hits;
+public class EventStatisticOutDto {
+    private String app;
+    private String uri;
+    private Long hits;
 }
