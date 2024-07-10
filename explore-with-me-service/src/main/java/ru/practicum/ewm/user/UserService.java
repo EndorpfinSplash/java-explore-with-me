@@ -2,12 +2,15 @@ package ru.practicum.ewm.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.user.dto.UserCreationDTO;
 import ru.practicum.ewm.user.dto.UserOutputDto;
 import ru.practicum.ewm.user.dto.UserUpdateDto;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,12 +29,12 @@ public class UserService {
     public UserOutputDto createUser(UserCreationDTO userCreationDTO) {
         User user = UserMapper.toUser(userCreationDTO);
         User savedUser = null;
-        try {
+//        try {
             savedUser = userStorage.save(user);
-        } catch (DataIntegrityViolationException e) {
-//            throw new NonUniqueEmail(String.format("Email = %s address has already in use", user.getEmail())
-            throw new RuntimeException();
-        }
+//        } catch (DataIntegrityViolationException e) {
+//            throw new NonUniqueEmail(String.format(e.getMessage()));
+//            throw new NonUniqueEmail(String.format("Email = %s address has already in use", user.getEmail()));
+//        }
         return UserMapper.toUserOutputDto(savedUser);
     }
 
@@ -62,5 +65,12 @@ public class UserService {
 
     public void deleteUserById(Integer id) {
         userStorage.deleteById(id);
+    }
+
+    public Collection<UserOutputDto> getUsers(List<Integer> ids, Integer from, Integer size) {
+        Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
+        return userStorage.findAllByIdOrderById(ids, page).stream()
+                .map(UserMapper::toUserOutputDto)
+                .collect(Collectors.toList());
     }
 }
