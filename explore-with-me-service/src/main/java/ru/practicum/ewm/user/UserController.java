@@ -2,6 +2,7 @@ package ru.practicum.ewm.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.user.dto.UserCreationDTO;
@@ -46,6 +47,7 @@ public class UserController {
 
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public UserOutputDto createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
         log.info("POST request to create {} received.", userCreationDTO);
         return userService.createUser(userCreationDTO);

@@ -34,6 +34,22 @@ public class ApplicationExceptionHandler {
                 e.getMessage());
     }
 
+    @ExceptionHandler({
+            UserNotFoundException.class,
+            ItemNotFoundException.class,
+            EventCategoryNotFoundException.class,
+            ItemRequestNotFoundException.class,
+            BookingAccessDeniedException.class,
+            BookingStatusCanChaneOnlyOwner.class
+    })
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse catchNotFound(final RuntimeException e) {
+        return new ErrorResponse(
+                "NOT_FOUND",
+                "The required object was not found.",
+                e.getMessage());
+    }
+
 
   /*  @ExceptionHandler({
             CommentForbidden.class,

@@ -10,6 +10,6 @@ public class ErrorResponse {
     private final String status;
     private final String reason;
     private final String message;
-            @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime timestamp = LocalDateTime.now();
 }
