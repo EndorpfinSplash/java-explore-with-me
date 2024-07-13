@@ -12,7 +12,8 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserCreationDTO {
+    @NotBlank(message = "Field: name. Error: must not be blank. Value: ")
     private String name;
-    @NotBlank
+    @NotBlank(message = "Field: email. Error: must not be blank. Value: ")
     private String email;
 }

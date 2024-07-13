@@ -6,7 +6,7 @@
 --
 -- drop table if exists REQUEST;
 
-drop table if exists USERS;
+-- drop table if exists USERS;
 
 
 CREATE TABLE IF NOT EXISTS USERS
