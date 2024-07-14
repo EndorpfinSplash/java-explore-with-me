@@ -5,14 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventCategoryCreationDto {
-
-    @NotBlank(message = "Field: name. Error: must not be blank. Value: null")
-    private String name;
+@Builder
+public class EventLocation {
+    private double lat;
+    private double lon;
 }

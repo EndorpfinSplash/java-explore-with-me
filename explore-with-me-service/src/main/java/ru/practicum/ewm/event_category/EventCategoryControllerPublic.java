@@ -3,6 +3,7 @@ package ru.practicum.ewm.event_category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.event_category.dto.EventCategoryOutDto;
 
 import java.util.Collection;
 

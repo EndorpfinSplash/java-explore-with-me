@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.event_category.dto.EventCategoryCreationDto;
+import ru.practicum.ewm.event_category.dto.EventCategoryOutDto;
 
 @RestController
 @RequestMapping(path = "/admin/categories")

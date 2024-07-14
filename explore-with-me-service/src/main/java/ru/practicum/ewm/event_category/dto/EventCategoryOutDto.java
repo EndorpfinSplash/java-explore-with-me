@@ -1,4 +1,4 @@
-package ru.practicum.ewm.event_category;
+package ru.practicum.ewm.event_category.dto;
 
 
 import lombok.Builder;

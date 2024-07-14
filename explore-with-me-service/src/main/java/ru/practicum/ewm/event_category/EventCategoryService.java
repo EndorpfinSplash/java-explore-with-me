@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewm.event_category.dto.EventCategoryCreationDto;
+import ru.practicum.ewm.event_category.dto.EventCategoryOutDto;
 import ru.practicum.ewm.exception.EventCategoryNotFoundException;
 
 import java.text.MessageFormat;
@@ -52,7 +54,7 @@ public class EventCategoryService {
         Long eventCategoryId = Long.valueOf(id);
         eventCategoryRepository.findById(eventCategoryId).orElseThrow(
                 () -> new EventCategoryNotFoundException(
-                        MessageFormat.format("Category with id={0}} was not found", eventCategoryId))
+                        MessageFormat.format("Category with id={0} was not found", eventCategoryId))
         );
         eventCategoryRepository.deleteById(eventCategoryId);
     }

@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
 
-
     private final UserRepository userStorage;
 
     public Collection<UserOutputDto> getAllUsers() {
