@@ -61,4 +61,8 @@ public class Event {
     @Builder.Default
     @Column(name = "CREATED_ON")
     private LocalDateTime createdOn = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS")
+    private EventStatus eventStatus;
 }

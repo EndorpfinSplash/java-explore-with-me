@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS EVENTS
     participant_limit  int,
     request_moderation boolean,
     title              VARCHAR(512),
-    created_on         TIMESTAMP WITHOUT TIME ZONE
+    created_on         TIMESTAMP WITHOUT TIME ZONE,
+    status             varchar(100)
 );
 
 
