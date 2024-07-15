@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventLocation;
+import ru.practicum.ewm.user.User;
 
 import java.time.LocalDateTime;
 
@@ -18,11 +20,17 @@ public class EventOutDto {
 
     private String annotation;
 
-    private long categoryId;
+    private EventCategory category;
+
+    private long confirmedRequests;
+
+    private LocalDateTime createdOn;
 
     private String description;
 
-    private LocalDateTime localDateTime;
+    private LocalDateTime eventDate;
+
+    private User initiator;
 
     private EventLocation location;
 
@@ -30,7 +38,13 @@ public class EventOutDto {
 
     private int participantLimit;
 
+    private LocalDateTime publishedOn;
+
     private boolean requestModeration;
 
+    private String state; //TODO create STATE ENUM
+
     private String title;
+
+    private long views; //TODO calculable
 }

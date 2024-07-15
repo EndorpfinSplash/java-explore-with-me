@@ -15,8 +15,8 @@ public class EventControllerPrivate {
     private final EventService eventService;
 
     @PostMapping
-    public EventOutDto createEvent(@RequestBody EventCreationDto eventCreationDto,
-                                   @PathVariable("userId") String userId) {
+    public EventOutDto createEvent(@RequestBody final EventCreationDto eventCreationDto,
+                                   @PathVariable("userId") final Integer userId) {
         log.info("Create event for user {} with event {}", userId, eventCreationDto);
         return eventService.createEvent(userId, eventCreationDto);
     }

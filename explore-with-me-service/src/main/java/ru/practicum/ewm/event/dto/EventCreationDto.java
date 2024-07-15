@@ -20,7 +20,7 @@ public class EventCreationDto {
 
     private String description;
 
-    private LocalDateTime localDateTime;
+    private LocalDateTime eventDate;
 
     private EventLocation location;
 

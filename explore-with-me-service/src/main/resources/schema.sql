@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS EVENTS
     paid               boolean,
     participant_limit  int,
     request_moderation boolean,
-    title              VARCHAR(512)
+    title              VARCHAR(512),
+    created_on         TIMESTAMP WITHOUT TIME ZONE
 );
 
 

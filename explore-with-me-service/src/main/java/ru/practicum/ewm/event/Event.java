@@ -38,7 +38,7 @@ public class Event {
     private String description;
 
     @Column(name = "EVENT_DATE")
-    private LocalDateTime localDateTime;
+    private LocalDateTime eventDate;
 
     @Column(name = "LOCATION_LAT")
     private double locationLat;
@@ -57,4 +57,8 @@ public class Event {
 
     @Column(name = "TITLE")
     private String title;
+
+    @Builder.Default
+    @Column(name = "CREATED_ON")
+    private LocalDateTime createdOn = LocalDateTime.now();
 }
