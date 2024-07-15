@@ -26,15 +26,16 @@ public class EventMapper {
                 .participantLimit(eventCreationDto.getParticipantLimit())
                 .requestModeration(eventCreationDto.isRequestModeration())
                 .title(eventCreationDto.getTitle())
+                .eventStatus(EventStatus.WAITING)
                 .build();
     }
 
 
-    public static EventOutDto eventToOutDto(Event savedEvent, long views) {
+    public static EventOutDto eventToOutDto(Event savedEvent, long views, long confirmedRequests) {
         return EventOutDto.builder()
                 .annotation(savedEvent.getAnnotation())
                 .category(savedEvent.getCategory())
-                .confirmedRequests(0L) //TODO set logic
+                .confirmedRequests(confirmedRequests)
                 .createdOn(savedEvent.getCreatedOn())
                 .description(savedEvent.getDescription())
                 .eventDate(savedEvent.getEventDate())
@@ -46,9 +47,9 @@ public class EventMapper {
                         .build())
                 .paid(savedEvent.isPaid())
                 .participantLimit(savedEvent.getParticipantLimit())
-                .publishedOn(LocalDateTime.now())//TODO set logic
+                .publishedOn(savedEvent.getPublishedOn())
                 .requestModeration(savedEvent.isRequestModeration())
-                .state("")//TODO create STATE ENUM
+                .state(savedEvent.getEventStatus().name())
                 .title(savedEvent.getTitle())
                 .views(views)
                 .build();

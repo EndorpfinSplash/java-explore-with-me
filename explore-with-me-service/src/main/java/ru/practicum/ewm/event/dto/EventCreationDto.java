@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.event_category.EventLocation;
 
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,10 +19,14 @@ public class EventCreationDto {
 
     private String annotation;
 
+    @NotBlank
     private long categoryId;
 
     private String description;
 
+
+    @FutureOrPresent
+    @NotNull
     private LocalDateTime eventDate;
 
     private EventLocation location;

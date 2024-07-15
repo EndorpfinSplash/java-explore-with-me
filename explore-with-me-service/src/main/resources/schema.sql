@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS EVENTS
     location_lon       real,
     paid               boolean,
     participant_limit  int,
+    published_on       Timestamp without time zone,
     request_moderation boolean,
     title              VARCHAR(512),
     created_on         TIMESTAMP WITHOUT TIME ZONE,

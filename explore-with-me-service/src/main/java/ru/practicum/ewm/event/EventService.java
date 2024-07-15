@@ -34,7 +34,7 @@ public class EventService {
         );
         Event eventForSave = EventMapper.creationDtoToEvent(eventCreationDto, user, eventCategory);
         Event savedEvent = eventRepository.save(eventForSave);
-        return EventMapper.eventToOutDto(savedEvent, 0L);
+        return EventMapper.eventToOutDto(savedEvent, 0L, 0L);
     }
 
 
