@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,13 +21,14 @@ public class EventCreationDto {
     private String annotation;
 
     @NotBlank
-    private long categoryId;
+    private long category;
 
     private String description;
 
 
     @FutureOrPresent
-    @NotNull
+    @NotNull(message = "The date and time must not be null")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     private EventLocation location;

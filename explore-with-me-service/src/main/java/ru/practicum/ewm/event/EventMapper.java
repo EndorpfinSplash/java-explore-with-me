@@ -6,8 +6,6 @@ import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventLocation;
 import ru.practicum.ewm.user.User;
 
-import java.time.LocalDateTime;
-
 public class EventMapper {
 
     public static Event creationDtoToEvent(EventCreationDto eventCreationDto,
@@ -39,7 +37,6 @@ public class EventMapper {
                 .createdOn(savedEvent.getCreatedOn())
                 .description(savedEvent.getDescription())
                 .eventDate(savedEvent.getEventDate())
-                .id(savedEvent.getId())
                 .initiator(savedEvent.getUser())
                 .location(EventLocation.builder()
                         .lat(savedEvent.getLocationLat())

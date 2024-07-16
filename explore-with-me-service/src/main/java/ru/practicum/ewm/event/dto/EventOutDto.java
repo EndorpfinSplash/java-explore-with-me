@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,18 +17,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class EventOutDto {
 
-    private long id;
-
     private String annotation;
 
     private EventCategory category;
 
     private long confirmedRequests;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdOn;
 
     private String description;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     private User initiator;
@@ -38,13 +39,14 @@ public class EventOutDto {
 
     private int participantLimit;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishedOn;
 
     private boolean requestModeration;
 
-    private String state; //TODO create STATE ENUM
+    private String state;
 
     private String title;
 
-    private long views; //TODO calculable
+    private long views;
 }

@@ -26,9 +26,9 @@ public class EventService {
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
 
-        Long eventCategoryId = eventCreationDto.getCategoryId();
+        Long eventCategoryId = eventCreationDto.getCategory();
         EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(
-                () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0}} was not found",
+                () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found",
                         eventCategoryId)
                 )
         );
