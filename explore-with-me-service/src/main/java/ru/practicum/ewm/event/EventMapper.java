@@ -2,6 +2,7 @@ package ru.practicum.ewm.event;
 
 import ru.practicum.ewm.event.dto.EventCreationDto;
 import ru.practicum.ewm.event.dto.EventOutDto;
+import ru.practicum.ewm.event.dto.EventUpdateDto;
 import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventLocation;
 import ru.practicum.ewm.user.User;
@@ -50,5 +51,26 @@ public class EventMapper {
                 .title(savedEvent.getTitle())
                 .views(views)
                 .build();
+    }
+
+    public static EventOutDto eventToOutDto(Event eventForUpdate, EventUpdateDto eventUpdateDto) {
+        EventOutDto eventOutDto = new EventOutDto();
+        if (eventUpdateDto.getAnnotation() != null) {
+            eventOutDto.setAnnotation(eventUpdateDto.getAnnotation());
+        }
+        if (eventUpdateDto.getTitle() != null) {
+            eventOutDto.setTitle(eventUpdateDto.getTitle());
+        }
+        if (eventUpdateDto.getDescription() != null) {
+            eventOutDto.setDescription(eventUpdateDto.getDescription());
+        }
+        if (eventUpdateDto.getEventDate() != null) {
+            eventOutDto.setEventDate(eventUpdateDto.getEventDate());
+        }
+        if (eventUpdateDto.getLocation() != null) {
+            eventOutDto.setLocation(eventUpdateDto.getLocation());
+        }
+//        if(eventUpdateDto.getCategory()!=null) {eventOutDto.setCategory(eventUpdateDto.getCategory());}
+        return eventOutDto;
     }
 }

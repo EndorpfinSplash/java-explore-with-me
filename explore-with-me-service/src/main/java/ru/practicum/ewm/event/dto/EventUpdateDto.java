@@ -9,14 +9,13 @@ import ru.practicum.ewm.event_category.EventLocation;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventCreationDto {
+public class EventUpdateDto {
 
     private String annotation;
 
@@ -27,7 +26,6 @@ public class EventCreationDto {
 
 
     @FutureOrPresent
-    @NotNull(message = "The date and time must not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 

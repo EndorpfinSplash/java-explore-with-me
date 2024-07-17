@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventCreationDto;
 import ru.practicum.ewm.event.dto.EventOutDto;
+import ru.practicum.ewm.event.dto.EventUpdateDto;
 
 import java.util.Collection;
 
@@ -39,5 +40,13 @@ public class EventControllerPrivate {
         return eventService.getUserEventById(userId, eventId);
     }
 
+    @PatchMapping("/{eventId}")
+    public EventOutDto patchEventById(@PathVariable("userId") final Integer userId,
+                                      @PathVariable("eventId") final Integer eventId,
+                                      @RequestBody final EventUpdateDto eventUpdateDto
+                                      ) {
+        log.info("GET request from userId={} to fetch  eventId={} received.", userId, eventId);
+        return eventService.patchUserEventById(userId, eventId, eventUpdateDto);
+    }
 
 }

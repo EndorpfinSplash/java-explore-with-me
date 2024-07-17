@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.dto.EventCreationDto;
 import ru.practicum.ewm.event.dto.EventOutDto;
+import ru.practicum.ewm.event.dto.EventUpdateDto;
 import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventCategoryRepository;
 import ru.practicum.ewm.exception.EventCategoryNotFoundException;
@@ -72,5 +73,19 @@ public class EventService {
                         () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
                 );
         return EventMapper.eventToOutDto(eventByUserAndId, 0L, 0L);
+    }
+
+    public EventOutDto patchUserEventById(Integer userId, Integer eventId, EventUpdateDto eventUpdateDto) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
+        );
+        //TODO define views and confirms
+        Event eventForUpdate = eventRepository.findEventByUserAndId(user, Long.valueOf(eventId))
+                .orElseThrow(
+                        () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+                );
+
+        EventMapper.eventToOutDto(eventForUpdate, eventUpdateDto);
+        return null;
     }
 }
