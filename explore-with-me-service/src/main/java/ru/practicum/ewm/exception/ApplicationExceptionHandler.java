@@ -25,7 +25,8 @@ public class ApplicationExceptionHandler {
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
-            NumberFormatException.class
+            NumberFormatException.class,
+            EventNotValidArgumentException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse catchValidation(final Exception e) {
