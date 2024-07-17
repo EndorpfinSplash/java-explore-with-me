@@ -25,10 +25,18 @@ public class EventControllerPrivate {
 
     @GetMapping
     public Collection<EventOutDto> getEvents(@PathVariable("userId") final Integer userId,
-                                             @RequestParam(value = "from",defaultValue = "0") final Integer from,
-                                             @RequestParam(value = "size",defaultValue = "10") final Integer size) {
-        log.info("GET request from userId={} to fetch collection of events from = {} with size = {} received.",userId, from, size);
-        return eventService.getUserEvents(userId,  from,  size);
+                                             @RequestParam(value = "from", defaultValue = "0") final Integer from,
+                                             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
+        log.info("GET request from userId={} to fetch collection of events from = {} with size = {} received.", userId, from, size);
+        return eventService.getUserEvents(userId, from, size);
+    }
+
+    @GetMapping("/{eventId}")
+    public EventOutDto getEventById(@PathVariable("userId") final Integer userId,
+                                    @PathVariable("eventId") final Integer eventId
+    ) {
+        log.info("GET request from userId={} to fetch  eventId={} received.", userId, eventId);
+        return eventService.getUserEventById(userId, eventId);
     }
 
 

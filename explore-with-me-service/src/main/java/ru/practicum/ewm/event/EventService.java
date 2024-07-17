@@ -9,6 +9,7 @@ import ru.practicum.ewm.event.dto.EventOutDto;
 import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventCategoryRepository;
 import ru.practicum.ewm.exception.EventCategoryNotFoundException;
+import ru.practicum.ewm.exception.EventNotFoundException;
 import ru.practicum.ewm.exception.EventNotValidArgumentException;
 import ru.practicum.ewm.exception.UserNotFoundException;
 import ru.practicum.ewm.user.User;
@@ -52,9 +53,24 @@ public class EventService {
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
-        return eventRepository.findAllByUserIdOrderById(userId,page)
+        return eventRepository.findAllByUserIdOrderById(userId, page)
                 .stream()
-                .map(event -> EventMapper.eventToOutDto(event, 0L, 0L))
+                .map(
+                        //TODO define views and confirms for each
+                        event -> EventMapper.eventToOutDto(event, 0L, 0L)
+                )
                 .collect(Collectors.toList());
+    }
+
+    public EventOutDto getUserEventById(Integer userId, Integer eventId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
+        );
+        //TODO define views and confirms
+        Event eventByUserAndId = eventRepository.findEventByUserAndId(user, Long.valueOf(eventId))
+                .orElseThrow(
+                        () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+                );
+        return EventMapper.eventToOutDto(eventByUserAndId, 0L, 0L);
     }
 }
