@@ -1,6 +1,8 @@
 package ru.practicum.ewm.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.dto.EventCreationDto;
 import ru.practicum.ewm.event.dto.EventOutDto;
@@ -12,6 +14,8 @@ import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserRepository;
 
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,4 +42,14 @@ public class EventService {
     }
 
 
+    public Collection<EventOutDto> getUserEvents(Integer userId, Integer from, Integer size) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
+        );
+        Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
+        return eventRepository.findAllByUserIdOrderById(userId,page)
+                .stream()
+                .map(event -> EventMapper.eventToOutDto(event, 0L, 0L))
+                .collect(Collectors.toList());
+    }
 }
