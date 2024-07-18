@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ApplicationExceptionHandler {
 
     @ExceptionHandler({
-            NonUniqueEmail.class, DataIntegrityViolationException.class
+            NonUniqueEmail.class,
+            NotApplicableEvent.class,
+            EventNotValidArgumentException.class,
+            DataIntegrityViolationException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse catchUniqueConstraint(final DataIntegrityViolationException e) {
@@ -24,9 +27,18 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler({
+            NotApplicableEvent.class
+    })
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse catchUniqueConstraint(final NotApplicableEvent e) {
+        return new ErrorResponse("FORBIDDEN",
+                "For the requested operation the conditions are not met.",
+                e.getMessage());
+    }
+
+    @ExceptionHandler({
             MethodArgumentNotValidException.class,
-            NumberFormatException.class,
-            EventNotValidArgumentException.class
+            NumberFormatException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse catchValidation(final Exception e) {

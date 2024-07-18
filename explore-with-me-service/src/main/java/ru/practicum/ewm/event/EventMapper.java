@@ -70,7 +70,6 @@ public class EventMapper {
         if (eventUpdateDto.getLocation() != null) {
             eventOutDto.setLocation(eventUpdateDto.getLocation());
         }
-//        if(eventUpdateDto.getCategory()!=null) {eventOutDto.setCategory(eventUpdateDto.getCategory());}
         return eventOutDto;
     }
 }

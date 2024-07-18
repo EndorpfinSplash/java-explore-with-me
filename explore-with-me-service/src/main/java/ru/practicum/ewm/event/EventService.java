@@ -9,10 +9,7 @@ import ru.practicum.ewm.event.dto.EventOutDto;
 import ru.practicum.ewm.event.dto.EventUpdateDto;
 import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventCategoryRepository;
-import ru.practicum.ewm.exception.EventCategoryNotFoundException;
-import ru.practicum.ewm.exception.EventNotFoundException;
-import ru.practicum.ewm.exception.EventNotValidArgumentException;
-import ru.practicum.ewm.exception.UserNotFoundException;
+import ru.practicum.ewm.exception.*;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserRepository;
 
@@ -76,6 +73,7 @@ public class EventService {
     }
 
     public EventOutDto patchUserEventById(Integer userId, Integer eventId, EventUpdateDto eventUpdateDto) {
+
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
@@ -84,8 +82,25 @@ public class EventService {
                 .orElseThrow(
                         () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
                 );
+        if (!(eventForUpdate.getEventStatus() == EventStatus.WAITING ||
+                eventForUpdate.getEventStatus() == EventStatus.CANCELED)
+        ) {
+            throw new NotApplicableEvent("Only pending or canceled events can be changed");
+        }
 
-        EventMapper.eventToOutDto(eventForUpdate, eventUpdateDto);
-        return null;
+        if (eventUpdateDto.getEventDate() != null && eventUpdateDto.getEventDate().minusHours(2L).isBefore(LocalDateTime.now())) {
+            throw new EventNotValidArgumentException("Event should be announced 2 hours earlier then event");
+        }
+
+        Long eventCategoryId = eventUpdateDto.getCategory();
+        if (eventCategoryId != null) {
+            EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(
+                    () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found",
+                            eventCategoryId)
+                    )
+            );
+            eventForUpdate.setCategory(eventCategory);
+        }
+        return EventMapper.eventToOutDto(eventForUpdate, eventUpdateDto);
     }
 }
