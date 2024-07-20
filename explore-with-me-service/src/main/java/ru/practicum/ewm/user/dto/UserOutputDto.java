@@ -8,7 +8,7 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class UserOutputDto {
-    private Integer id;
+    private Long id;
     private String name;
     private String email;
 }

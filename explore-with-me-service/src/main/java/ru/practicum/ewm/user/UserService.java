@@ -32,7 +32,7 @@ public class UserService {
         return UserMapper.toUserOutputDto(savedUser);
     }
 
-    public UserOutputDto updateUser(Integer userId, UserUpdateDto userUpdateDto) {
+    public UserOutputDto updateUser(Long userId, UserUpdateDto userUpdateDto) {
         User userForUpdate = userStorage.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
@@ -41,7 +41,7 @@ public class UserService {
         return UserMapper.toUserOutputDto(updatedUser);
     }
 
-    public UserOutputDto getUserById(Integer userId) {
+    public UserOutputDto getUserById(Long userId) {
         User user = userStorage.findById(userId)
                 .orElseThrow(
                         () -> new UserNotFoundException(MessageFormat.format("User with userId={0} was not found", userId))
@@ -49,11 +49,11 @@ public class UserService {
         return UserMapper.toUserOutputDto(user);
     }
 
-    public void deleteUserById(Integer id) {
+    public void deleteUserById(Long id) {
         userStorage.deleteById(id);
     }
 
-    public Collection<UserOutputDto> getUsers(List<Integer> ids, Integer from, Integer size) {
+    public Collection<UserOutputDto> getUsers(List<Long> ids, Integer from, Integer size) {
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
         return userStorage.findAllByIdOrderById(ids, page).stream()
                 .map(UserMapper::toUserOutputDto)

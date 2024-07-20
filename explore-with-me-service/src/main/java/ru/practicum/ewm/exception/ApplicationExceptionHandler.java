@@ -15,9 +15,10 @@ public class ApplicationExceptionHandler {
 
     @ExceptionHandler({
             NonUniqueEmail.class,
-            NotApplicableEvent.class,
+//            NotApplicableEvent.class,
             EventNotValidArgumentException.class,
-            DataIntegrityViolationException.class
+            DataIntegrityViolationException.class,
+            NotValidRequestException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse catchUniqueConstraint(final DataIntegrityViolationException e) {

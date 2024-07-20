@@ -26,7 +26,7 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventCategoryRepository eventCategoryRepository;
 
-    public EventOutDto createEvent(Integer userId, EventCreationDto eventCreationDto) {
+    public EventOutDto createEvent(Long userId, EventCreationDto eventCreationDto) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
@@ -46,7 +46,7 @@ public class EventService {
     }
 
 
-    public Collection<EventOutDto> getUserEvents(Integer userId, Integer from, Integer size) {
+    public Collection<EventOutDto> getUserEvents(Long userId, Integer from, Integer size) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
@@ -60,7 +60,7 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    public EventOutDto getUserEventById(Integer userId, Integer eventId) {
+    public EventOutDto getUserEventById(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
@@ -72,13 +72,13 @@ public class EventService {
         return EventMapper.eventToOutDto(eventByUserAndId, 0L, 0L);
     }
 
-    public EventOutDto patchUserEventById(Integer userId, Integer eventId, EventUpdateDto eventUpdateDto) {
+    public EventOutDto patchUserEventById(Long userId, Long eventId, EventUpdateDto eventUpdateDto) {
 
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
         //TODO define views and confirms
-        Event eventForUpdate = eventRepository.findEventByUserAndId(user, Long.valueOf(eventId))
+        Event eventForUpdate = eventRepository.findEventByUserAndId(user, eventId)
                 .orElseThrow(
                         () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
                 );
@@ -101,6 +101,6 @@ public class EventService {
             );
             eventForUpdate.setCategory(eventCategory);
         }
-        return EventMapper.eventToOutDto(eventForUpdate, eventUpdateDto);
+        return EventMapper.eventToOutDto(eventUpdateDto);
     }
 }

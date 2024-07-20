@@ -32,6 +32,7 @@ public class EventMapper {
 
     public static EventOutDto eventToOutDto(Event savedEvent, long views, long confirmedRequests) {
         return EventOutDto.builder()
+                .id(savedEvent.getId())
                 .annotation(savedEvent.getAnnotation())
                 .category(savedEvent.getCategory())
                 .confirmedRequests(confirmedRequests)
@@ -53,7 +54,7 @@ public class EventMapper {
                 .build();
     }
 
-    public static EventOutDto eventToOutDto(Event eventForUpdate, EventUpdateDto eventUpdateDto) {
+    public static EventOutDto eventToOutDto(EventUpdateDto eventUpdateDto) {
         EventOutDto eventOutDto = new EventOutDto();
         if (eventUpdateDto.getAnnotation() != null) {
             eventOutDto.setAnnotation(eventUpdateDto.getAnnotation());

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(" select u from User u " +
             " where u.id in (?1) " +
             " order by u.id ")
-     List<User> findAllByIdOrderById(List<Integer> ids, Pageable page);
+     List<User> findAllByIdOrderById(List<Long> ids, Pageable page);
 }
