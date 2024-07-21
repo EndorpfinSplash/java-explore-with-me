@@ -21,7 +21,7 @@ public class ApplicationExceptionHandler {
             NotValidRequestException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse catchUniqueConstraint(final DataIntegrityViolationException e) {
+    public ErrorResponse catchUniqueConstraint(final Exception e) {
         return new ErrorResponse("CONFLICT",
                 "Integrity constraint has been violated.",
                 e.getMessage());
@@ -53,7 +53,7 @@ public class ApplicationExceptionHandler {
             ItemNotFoundException.class,
             EventCategoryNotFoundException.class,
             EventNotFoundException.class,
-            ItemRequestNotFoundException.class,
+            RequestNotFoundException.class,
             BookingAccessDeniedException.class,
             BookingStatusCanChaneOnlyOwner.class
     })

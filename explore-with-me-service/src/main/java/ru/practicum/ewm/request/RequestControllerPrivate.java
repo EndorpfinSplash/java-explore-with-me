@@ -4,9 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.event.dto.EventOutDto;
-import ru.practicum.ewm.event.dto.EventUpdateDto;
-import ru.practicum.ewm.request.dto.RequestCreationDto;
 import ru.practicum.ewm.request.dto.RequestOutDto;
 
 import java.util.Collection;
@@ -21,36 +18,23 @@ public class RequestControllerPrivate {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RequestOutDto createRequest(@RequestBody final RequestCreationDto requestCreationDto,
-                                       @PathVariable("userId") final Long userId,
-                                       @RequestParam("eventId")final Long eventId) {
-        log.info("Create request from user {} for event_id={}", userId, requestCreationDto);
-        return requestService.createRequest(userId, eventId, requestCreationDto);
+    public RequestOutDto createRequest(@PathVariable("userId") final Long userId,
+                                       @RequestParam("eventId") final Long eventId) {
+        log.info("Create request from user {} for event_id={}", userId, eventId);
+        return requestService.createRequest(userId, eventId);
     }
 
-//    @GetMapping
-//    public Collection<EventOutDto> getEvents(@PathVariable("userId") final Integer userId,
-//                                             @RequestParam(value = "from", defaultValue = "0") final Integer from,
-//                                             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
-//        log.info("GET request from userId={} to fetch collection of events from = {} with size = {} received.", userId, from, size);
-//        return requestService.getUserEvents(userId, from, size);
-//    }
-//
-//    @GetMapping("/{eventId}")
-//    public EventOutDto getEventById(@PathVariable("userId") final Integer userId,
-//                                    @PathVariable("eventId") final Integer eventId
-//    ) {
-//        log.info("GET request from userId={} to fetch  eventId={} received.", userId, eventId);
-//        return requestService.getUserEventById(userId, eventId);
-//    }
-//
-//    @PatchMapping("/{eventId}")
-//    public EventOutDto patchEventById(@PathVariable("userId") final Integer userId,
-//                                      @PathVariable("eventId") final Integer eventId,
-//                                      @RequestBody final EventUpdateDto eventUpdateDto
-//    ) {
-//        log.info("GET request from userId={} to fetch  eventId={} received.", userId, eventId);
-//        return requestService.patchUserEventById(userId, eventId, eventUpdateDto);
-//    }
+    @GetMapping
+    public Collection<RequestOutDto> getAllUserRequests(@PathVariable("userId") final Long userId) {
+        log.info("Get all request for user {} ", userId);
+        return requestService.getAllRequest(userId);
+    }
+
+    @PatchMapping("/{requestId}/cancel")
+    public RequestOutDto cancelRequest(@PathVariable("userId") final Long userId
+            , @PathVariable("requestId") final Long requestId) {
+        log.info("Cancel request_id={} for user {} ",requestId, userId);
+        return requestService.cancelRequest(userId, requestId);
+    }
 
 }

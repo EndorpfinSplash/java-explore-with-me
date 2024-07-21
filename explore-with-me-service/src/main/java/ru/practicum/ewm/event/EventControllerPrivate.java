@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventCreationDto;
 import ru.practicum.ewm.event.dto.EventOutDto;
 import ru.practicum.ewm.event.dto.EventUpdateDto;
+import ru.practicum.ewm.request.Request;
+import ru.practicum.ewm.request.dto.RequestOutDto;
 
+import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
@@ -20,7 +23,7 @@ public class EventControllerPrivate {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventOutDto createEvent(@RequestBody final EventCreationDto eventCreationDto,
+    public EventOutDto createEvent(@RequestBody @Valid final EventCreationDto eventCreationDto,
                                    @PathVariable("userId") final Long userId) {
         log.info("Create event for user {} with event {}", userId, eventCreationDto);
         return eventService.createEvent(userId, eventCreationDto);
@@ -45,10 +48,18 @@ public class EventControllerPrivate {
     @PatchMapping("/{eventId}")
     public EventOutDto patchEventById(@PathVariable("userId") final Long userId,
                                       @PathVariable("eventId") final Long eventId,
-                                      @RequestBody final EventUpdateDto eventUpdateDto
-                                      ) {
+                                      @RequestBody @Valid final EventUpdateDto eventUpdateDto
+    ) {
         log.info("GET request from userId={} to fetch  eventId={} received.", userId, eventId);
         return eventService.patchUserEventById(userId, eventId, eventUpdateDto);
+    }
+
+    @GetMapping("/{eventId}/requests")
+    public Collection<RequestOutDto> getAllRequestsForEvent(@PathVariable("userId") final Long userId,
+                                                            @PathVariable("eventId") final Long eventId
+    ) {
+        log.info("GET all requests for eventId={} created by userId={}.", eventId, userId);
+        return eventService.getEventRequests(userId, eventId);
     }
 
 }

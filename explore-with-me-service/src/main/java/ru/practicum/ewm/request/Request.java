@@ -35,9 +35,10 @@ public class Request {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
-    private RequestStatus status;
+    private RequestStatus status = RequestStatus.WAITING;
 
 
 }

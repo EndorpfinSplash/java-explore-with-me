@@ -31,7 +31,7 @@ public class UserController {
 
     @GetMapping
     public Collection<UserOutputDto> getUsers(
-            @RequestParam List<Long> ids,
+            @RequestParam (required = false) List<Long> ids,
             @RequestParam(value = "from", defaultValue = "0") Integer from,
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
@@ -48,20 +48,20 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserOutputDto createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
+    public UserOutputDto createUser(@Valid @RequestBody final UserCreationDTO userCreationDTO) {
         log.info("POST request to create {} received.", userCreationDTO);
         return userService.createUser(userCreationDTO);
     }
 
     @PatchMapping("/{id}")
-    public UserOutputDto updateUser(@PathVariable("id") Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) {
+    public UserOutputDto updateUser(@PathVariable("id") Long id, @Valid @RequestBody final UserUpdateDto userUpdateDto) {
         log.info("PATCH request to update user_id={} received.", id);
         return userService.updateUser(id, userUpdateDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable("id") Long id) {
+    public void deleteUser(@PathVariable("id") final Long id) {
         log.info("Delete request to remove user_id={} received.", id);
         userService.deleteUserById(id);
     }

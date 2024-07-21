@@ -10,6 +10,7 @@ import ru.practicum.ewm.event_category.EventLocation;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,11 +19,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class EventCreationDto {
 
+    @NotBlank
     private String annotation;
 
-    @NotBlank
     private Long category;
 
+    @NotBlank
     private String description;
 
 
@@ -35,6 +37,7 @@ public class EventCreationDto {
 
     private boolean paid;
 
+    @Positive
     private int participantLimit;
 
     private boolean requestModeration;

@@ -10,12 +10,17 @@ import ru.practicum.ewm.event.dto.EventUpdateDto;
 import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventCategoryRepository;
 import ru.practicum.ewm.exception.*;
+import ru.practicum.ewm.request.Request;
+import ru.practicum.ewm.request.RequestMapper;
+import ru.practicum.ewm.request.RequestRepository;
+import ru.practicum.ewm.request.dto.RequestOutDto;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserRepository;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +30,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventCategoryRepository eventCategoryRepository;
+    private final RequestRepository requestRepository;
 
     public EventOutDto createEvent(Long userId, EventCreationDto eventCreationDto) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -65,7 +71,7 @@ public class EventService {
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
         //TODO define views and confirms
-        Event eventByUserAndId = eventRepository.findEventByUserAndId(user, Long.valueOf(eventId))
+        Event eventByUserAndId = eventRepository.findEventByUserAndId(user, eventId)
                 .orElseThrow(
                         () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
                 );
@@ -102,5 +108,20 @@ public class EventService {
             eventForUpdate.setCategory(eventCategory);
         }
         return EventMapper.eventToOutDto(eventUpdateDto);
+    }
+
+    public List<RequestOutDto> getEventRequests(Long userId, Long eventId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
+        );
+        Event event = eventRepository.findEventByUserAndId(user, eventId)
+                .orElseThrow(
+                        () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+                );
+
+        return requestRepository.findRequestByEventId(eventId)
+                .stream()
+                .map(RequestMapper::RequestToOutDto)
+                .collect(Collectors.toList());
     }
 }
