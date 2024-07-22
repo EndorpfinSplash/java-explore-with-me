@@ -6,11 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.EventStatus;
-import ru.practicum.ewm.exception.EventNotFoundException;
-import ru.practicum.ewm.exception.NotValidRequestException;
-import ru.practicum.ewm.exception.RequestNotFoundException;
-import ru.practicum.ewm.exception.UserNotFoundException;
-import ru.practicum.ewm.request.dto.RequestOutDto;
+import ru.practicum.ewm.exception.*;
+import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserRepository;
 
@@ -22,11 +19,11 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Slf4j
 public class RequestService {
-    final RequestRepository requestRepository;
-    final UserRepository userRepository;
-    final EventRepository eventRepository;
+    private final RequestRepository requestRepository;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
-    public RequestOutDto createRequest(Long userId, Long eventId) {
+    public ParticipationRequestDto createRequest(Long userId, Long eventId) {
         User requester = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("Requester with userId={0} not found", userId))
         );
@@ -55,11 +52,9 @@ public class RequestService {
             );
         }
 
-        int participantsCnt = requestRepository.countRequestByEventAndStatus(event, RequestStatus.ACCEPTED);
+        int participantsCnt = requestRepository.countRequestByEventAndStatus(event, RequestStatus.CONFIRMED);
         if (participantsCnt > event.getParticipantLimit()) {
-            throw new NotValidRequestException(
-                    MessageFormat.format("Event_id={0} has achieved participants limit={1}", eventId, participantsCnt)
-            );
+            throw new ParticipantsLimitationException("The participant limit has been reached");
         }
 
         Request request = Request.builder()
@@ -67,7 +62,7 @@ public class RequestService {
                 .event(event)
                 .build();
         if (!event.isRequestModeration()) {
-            request.setStatus(RequestStatus.ACCEPTED);
+            request.setStatus(RequestStatus.CONFIRMED);
         }
 
         Request savedRequest = requestRepository.save(request);
@@ -75,11 +70,11 @@ public class RequestService {
         return RequestMapper.RequestToOutDto(savedRequest);
     }
 
-    public Collection<RequestOutDto> getAllRequest(Long userId) {
+    public Collection<ParticipationRequestDto> getAllRequest(Long userId) {
         return requestRepository.getAllByRequesterIdOrderById(userId);
     }
 
-    public RequestOutDto cancelRequest(Long userId, Long requestId) {
+    public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} was not found", userId))
         );
@@ -91,7 +86,7 @@ public class RequestService {
         if (!Objects.equals(user.getId(), request.getRequester().getId())) {
             throw new NotValidRequestException("You can cancel only your own requests");
         }
-        request.setStatus(RequestStatus.CANCELLED);
+        request.setStatus(RequestStatus.REJECTED);
         Request savedRequest = requestRepository.save(request);
         return RequestMapper.RequestToOutDto(savedRequest);
     }

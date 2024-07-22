@@ -1,20 +1,20 @@
 package ru.practicum.ewm.request;
 
 import ru.practicum.ewm.event.Event;
-import ru.practicum.ewm.request.dto.RequestCreationDto;
-import ru.practicum.ewm.request.dto.RequestOutDto;
+import ru.practicum.ewm.request.dto.NewUserRequest;
+import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.user.User;
 
 public class RequestMapper {
-    public static Request RequesetCreationDtoToRequest(RequestCreationDto requestCreationDto, User user, Event event) {
+    public static Request NewRequestDtoToRequest(NewUserRequest newUserRequest, User user, Event event) {
         return Request.builder()
                 .requester(user)
                 .event(event)
                 .build();
     }
 
-    public static RequestOutDto RequestToOutDto(Request request) {
-        return RequestOutDto.builder()
+    public static ParticipationRequestDto RequestToOutDto(Request request) {
+        return ParticipationRequestDto.builder()
                 .created(request.getCreated())
                 .event(request.getEvent().getId())
                 .id(request.getId())

@@ -4,11 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.event.dto.EventCreationDto;
-import ru.practicum.ewm.event.dto.EventOutDto;
-import ru.practicum.ewm.event.dto.EventUpdateDto;
-import ru.practicum.ewm.request.Request;
-import ru.practicum.ewm.request.dto.RequestOutDto;
+import ru.practicum.ewm.event.dto.*;
+import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -55,11 +52,21 @@ public class EventControllerPrivate {
     }
 
     @GetMapping("/{eventId}/requests")
-    public Collection<RequestOutDto> getAllRequestsForEvent(@PathVariable("userId") final Long userId,
-                                                            @PathVariable("eventId") final Long eventId
+    public Collection<ParticipationRequestDto> getAllRequestsForEvent(@PathVariable("userId") final Long userId,
+                                                                      @PathVariable("eventId") final Long eventId
     ) {
         log.info("GET all requests for eventId={} created by userId={}.", eventId, userId);
         return eventService.getEventRequests(userId, eventId);
+    }
+
+
+    @PatchMapping("/{eventId}/requests")
+    public EventRequestStatusUpdateResult patchEventByIds(@PathVariable("userId") final Long userId,
+                                                          @PathVariable("eventId") final Long eventId,
+                                                          @RequestBody @Valid final EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest
+    ) {
+        log.info("Patch request from userId={} to update requests for eventId={} received.", userId, eventId);
+        return eventService.patchRequests(userId, eventId, eventRequestStatusUpdateRequest);
     }
 
 }

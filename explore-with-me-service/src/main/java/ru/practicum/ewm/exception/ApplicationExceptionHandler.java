@@ -15,15 +15,25 @@ public class ApplicationExceptionHandler {
 
     @ExceptionHandler({
             NonUniqueEmail.class,
-//            NotApplicableEvent.class,
             EventNotValidArgumentException.class,
             DataIntegrityViolationException.class,
-            NotValidRequestException.class
+            NotValidRequestException.class,
+//            ParticipantsLimitationException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse catchUniqueConstraint(final Exception e) {
         return new ErrorResponse("CONFLICT",
                 "Integrity constraint has been violated.",
+                e.getMessage());
+    }
+
+    @ExceptionHandler({
+            ParticipantsLimitationException.class
+    })
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse catchParticipantsChecks(final Exception e) {
+        return new ErrorResponse("CONFLICT",
+                "For the requested operation the conditions are not met.",
                 e.getMessage());
     }
 
@@ -39,7 +49,8 @@ public class ApplicationExceptionHandler {
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
-            NumberFormatException.class
+            NumberFormatException.class,
+            IncorrectStatusException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse catchValidation(final Exception e) {

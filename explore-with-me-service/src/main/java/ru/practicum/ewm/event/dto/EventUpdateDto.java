@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import ru.practicum.ewm.event_category.EventLocation;
 
 import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
@@ -17,11 +19,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class EventUpdateDto {
 
+    @Min(20L)
+    @Max( 000L)
     private String annotation;
 
-    @NotBlank
     private Long category;
 
+    @Min(20L)
+    @Max(7000L)
     private String description;
 
 
@@ -33,9 +38,11 @@ public class EventUpdateDto {
 
     private boolean paid;
 
-    private int participantLimit;
+    private Integer participantLimit;
 
     private boolean requestModeration;
 
+    @Min(3L)
+    @Max(120L)
     private String title;
 }

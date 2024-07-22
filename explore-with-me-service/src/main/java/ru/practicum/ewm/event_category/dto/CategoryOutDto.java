@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class EventCategoryOutDto {
+public class CategoryOutDto {
     private Long id;
     private String name;
 }

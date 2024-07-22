@@ -38,7 +38,7 @@ public class Request {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
-    private RequestStatus status = RequestStatus.WAITING;
+    private RequestStatus status = RequestStatus.PENDING;
 
 
 }

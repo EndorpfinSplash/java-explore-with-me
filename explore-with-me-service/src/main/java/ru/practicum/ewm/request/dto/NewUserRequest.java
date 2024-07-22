@@ -11,12 +11,12 @@ import ru.practicum.ewm.request.RequestStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class RequestCreationDto {
+public class NewUserRequest {
 
     private Long userId;
     private Long eventId;
 
     @Builder.Default
-    private RequestStatus status = RequestStatus.WAITING;
+    private RequestStatus status = RequestStatus.PENDING;
 
 }

@@ -7,10 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.event_category.EventLocation;
 
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Data
@@ -20,11 +17,15 @@ import java.time.LocalDateTime;
 public class EventCreationDto {
 
     @NotBlank
+    @Min(20L)
+    @Max(2000L)
     private String annotation;
 
     private Long category;
 
     @NotBlank
+    @Min(20L)
+    @Max(7000L)
     private String description;
 
 
@@ -38,9 +39,13 @@ public class EventCreationDto {
     private boolean paid;
 
     @Positive
-    private int participantLimit;
+    @Builder.Default
+    private int participantLimit = 0;
 
     private boolean requestModeration;
 
+    @NotBlank
+    @Min(3L)
+    @Max(120L)
     private String title;
 }

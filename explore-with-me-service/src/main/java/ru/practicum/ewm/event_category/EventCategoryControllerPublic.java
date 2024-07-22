@@ -3,7 +3,7 @@ package ru.practicum.ewm.event_category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.event_category.dto.EventCategoryOutDto;
+import ru.practicum.ewm.event_category.dto.CategoryOutDto;
 
 import java.util.Collection;
 
@@ -17,7 +17,7 @@ public class EventCategoryControllerPublic {
 
 
     @GetMapping
-    public Collection<EventCategoryOutDto> getAll(
+    public Collection<CategoryOutDto> getAll(
             @RequestParam(value = "from", defaultValue = "0") Integer from,
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
@@ -26,7 +26,7 @@ public class EventCategoryControllerPublic {
     }
 
     @GetMapping("/{id}")
-    public EventCategoryOutDto getById(
+    public CategoryOutDto getById(
             @PathVariable("id") Integer id
     ) {
         log.info("GET request to fetch event_category_id={} received.", id);
