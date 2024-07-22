@@ -193,14 +193,14 @@ public class EventService {
     }
 
     public List<EventOutDto> getPublicEvents(Optional<String> text,
-                                                   Optional<List<Integer>> categories,
-                                                   Optional<Boolean> paid,
-                                                   Optional<String> rangeStart,
-                                                   Optional<String> rangeEnd,
-                                                   boolean onlyAvailable,
-                                                   Optional<String> sort,
-                                                   Integer from,
-                                                   Integer size
+                                             Optional<List<Integer>> categories,
+                                             Optional<Boolean> paid,
+                                             Optional<String> rangeStart,
+                                             Optional<String> rangeEnd,
+                                             boolean onlyAvailable,
+                                             Optional<String> sort,
+                                             Integer from,
+                                             Integer size
     ) {
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -219,15 +219,26 @@ public class EventService {
                     Predicate annotationLike = cb.like(cb.lower(event.get("annotation")), pattern);
                     predicates.add(cb.or(descriptionLike, annotationLike));
                 }
-
         );
 
+        Predicate startFromPredicate =
+                cb.greaterThan(event.get("EVENT_DATE"),
+                        rangeStart.isEmpty() ? LocalDateTime.now() :
+                                LocalDateTime.parse(rangeStart.get())
+                );
+        predicates.add(startFromPredicate);
+
+        rangeEnd.ifPresent(
+                endTime -> {
+                    predicates.add(cb.lessThan(event.get("EVENT_DATE"), LocalDateTime.parse(rangeStart.get())));
+                }
+        );
 
         query.where(predicates.toArray(new Predicate[0]));
 
         List<Event> eventsList = entityManager.createQuery(query).getResultList();
         return eventsList.stream()
-                .map(event1 -> EventMapper.eventToOutDto(event1, 0L , 0L))
+                .map(event1 -> EventMapper.eventToOutDto(event1, 0L, 0L))
                 .collect(Collectors.toList());
 
     }
