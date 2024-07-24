@@ -27,7 +27,7 @@ public class Request {
     @Column(name = "CREATED_ON", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id")
     private User requester;
 

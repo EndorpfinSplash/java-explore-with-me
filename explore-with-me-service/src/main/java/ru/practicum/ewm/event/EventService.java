@@ -8,10 +8,7 @@ import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventCategoryRepository;
 import ru.practicum.ewm.exception.*;
-import ru.practicum.ewm.request.Request;
-import ru.practicum.ewm.request.RequestMapper;
-import ru.practicum.ewm.request.RequestRepository;
-import ru.practicum.ewm.request.RequestStatus;
+import ru.practicum.ewm.request.*;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserRepository;
@@ -23,10 +20,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -237,8 +231,13 @@ public class EventService {
         query.where(predicates.toArray(new Predicate[0]));
 
         List<Event> eventsList = entityManager.createQuery(query).getResultList();
+
+        Map<Long, Long> requestsByEvent = requestRepository.countRequestByEventId(RequestStatus.CONFIRMED).stream()
+                .collect(Collectors.toMap(RequestsCountByEvent::getEventId, RequestsCountByEvent::getCount));
+
+
         return eventsList.stream()
-                .map(event1 -> EventMapper.eventToOutDto(event1, 0L, 0L))
+                .map(eventEntity -> EventMapper.eventToOutDto(eventEntity, 0L, requestsByEvent.get(eventEntity.getId())))
                 .collect(Collectors.toList());
 
     }
