@@ -3,10 +3,11 @@ package ru.practicum.statistica;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.commons.EventCreationDto;
+import ru.practicum.commons.EndpointHit;
 import ru.practicum.commons.EventOutDto;
-import ru.practicum.commons.EventStatisticOutDto;
+import ru.practicum.commons.ViewStats;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -22,16 +23,17 @@ public class StatisticController {
 
 
     @PostMapping("/hit")
+    @ResponseStatus(HttpStatus.CREATED)
     public EventOutDto hit(
-            @RequestBody @Valid EventCreationDto eventCreationDto) {
-        log.info("Collect data about event {}", eventCreationDto);
-        EventOutDto savedEvent = statisticService.save(eventCreationDto);
-        log.info("Event {} was saved", savedEvent);
+            @RequestBody @Valid EndpointHit endpointHit) {
+        log.info("Collect data about event {}", endpointHit);
+        EventOutDto savedEvent = statisticService.save(endpointHit);
+        log.info("Data about request to end-point {} was saved", savedEvent);
         return savedEvent;
     }
 
     @GetMapping("/stats")
-    public List<EventStatisticOutDto> getStats(
+    public List<ViewStats> getStats(
 
             @RequestParam(name = "start")
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -44,7 +46,7 @@ public class StatisticController {
     ) {
         log.info("Get events from {} to end {} for list of URIs[{}] with unique flag {}",
                 start, end, Collections.singletonList(uris), unique);
-        List<EventStatisticOutDto> eventStatistic = statisticService.getEventStatistic(start, end, uris, unique);
+        List<ViewStats> eventStatistic = statisticService.getEventStatistic(start, end, uris, unique);
         log.info("Event statistic calculated: {} ", eventStatistic);
         return eventStatistic;
     }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class EventOutDto {
-    private long id;
+    private Long id;
     private String app;
     private String uri;
     private String ip;

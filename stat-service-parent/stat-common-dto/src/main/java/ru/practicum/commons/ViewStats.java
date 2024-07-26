@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventStatisticOutDto {
+public class ViewStats {
     private String app;
     private String uri;
     private Long hits;
