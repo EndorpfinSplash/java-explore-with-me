@@ -17,14 +17,14 @@ public class StatisticRestClient {
     private static final String RESOURCE_PATH_TO_GET_STATISTIC = "/stats";
 
     @Value("${server.port}")
-    private int port;
+    private static int port;
 
     @Value("${host}")
-    private String host;
+    private static String host;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private static final RestTemplate restTemplate = new RestTemplate();
 
-    public EventOutDto sendData(EndpointHit endpointHit) {
+    public static EventOutDto sendData(EndpointHit endpointHit) {
         String requestUri = host + ":" + port + RESOURCE_PATH_TO_SAVE_EVENT;
         return restTemplate.postForEntity(requestUri,
                         endpointHit,
@@ -32,16 +32,21 @@ public class StatisticRestClient {
                 .getBody();
     }
 
-    public List<ViewStats> getData(String start, String end, String uris, String unique) {
+    public static List<ViewStats> getData(String start, String end, List<String> uris, String unique) {
         String requestUri = host + ":" + port + RESOURCE_PATH_TO_GET_STATISTIC;
 
-        Map<String, String> urlParameters = new HashMap<>();
+        Map<String, Object> urlParameters = new HashMap<>();
         urlParameters.put("start", start);
         urlParameters.put("end", end);
-        urlParameters.put("uris", uris);
-        urlParameters.put("unique", unique);
+        if(uris != null && !uris.isEmpty()) {
+            urlParameters.put("uris", uris);
+        }
+        if(unique != null && !unique.isEmpty()) {
+            urlParameters.put("unique", unique);
+        }
 
-        ResponseEntity<ViewStats[]> events = restTemplate.getForEntity(requestUri,
+        ResponseEntity<ViewStats[]> events = restTemplate.getForEntity(
+                requestUri,
                 ViewStats[].class,
                 urlParameters);
         return events.getBody() != null ? Arrays.asList(events.getBody()) :

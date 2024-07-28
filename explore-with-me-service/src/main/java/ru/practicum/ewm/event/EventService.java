@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.practicum.StatisticRestClient;
+import ru.practicum.commons.EndpointHit;
+import ru.practicum.commons.ViewStats;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventCategoryRepository;
@@ -14,12 +17,13 @@ import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserRepository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +31,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EventService {
 
+    public static final String EWM_MAIN_SERVICE_NAME = "ewm-main-service";
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventCategoryRepository eventCategoryRepository;
@@ -186,7 +192,8 @@ public class EventService {
         );
     }
 
-    public List<EventOutDto> getPublicEvents(Optional<String> text,
+    public List<EventOutDto> getPublicEvents(HttpServletRequest httpServletRequest,
+                                             Optional<String> text,
                                              Optional<List<Integer>> categories,
                                              Optional<Boolean> paid,
                                              Optional<String> rangeStart,
@@ -196,14 +203,42 @@ public class EventService {
                                              Integer from,
                                              Integer size
     ) {
+        EndpointHit endpointHit = EndpointHit.builder()
+                .app(EWM_MAIN_SERVICE_NAME)
+                .ip(httpServletRequest.getRemoteAddr())
+                .uri(httpServletRequest.getRequestURI())
+                .build();
+        StatisticRestClient.sendData(endpointHit);
+
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> query = cb.createQuery(Event.class);
         Root<Event> event = query.from(Event.class);
 
+//        if (sort.isPresent()) {
+//            query = query.orderBy(cb.asc(event.get(sort.get())));
+//        }
+
         List<Predicate> predicates = new ArrayList<>();
         Predicate statusPublished = cb.equal(event.get("status"), EventStatus.PUBLISHED);
         predicates.add(statusPublished);
+
+        categories.ifPresent(categoriesList ->
+                {
+                    Predicate inCategoryPredicate = event.get("category").in(categoriesList);
+                    predicates.add(inCategoryPredicate);
+                }
+        );
+
+        paid.ifPresent(isPaid ->
+                {
+                    Predicate isPaidPredicate = cb.equal(event.get("paid"), isPaid);
+                    predicates.add(isPaidPredicate);
+                }
+        );
+
+        Predicate isOnlyAvailablePredicate = cb.equal(event.get("onlyAvailable"), onlyAvailable);
+        predicates.add(isOnlyAvailablePredicate);
 
         text.ifPresent(
                 txt ->
@@ -224,21 +259,70 @@ public class EventService {
 
         rangeEnd.ifPresent(
                 endTime -> {
-                    predicates.add(cb.lessThan(event.get("EVENT_DATE"), LocalDateTime.parse(rangeStart.get())));
+                    predicates.add(
+                            cb.lessThan(event.get("EVENT_DATE"),
+                                    LocalDateTime.parse(rangeStart.get()))
+                    );
                 }
         );
 
         query.where(predicates.toArray(new Predicate[0]));
 
-        List<Event> eventsList = entityManager.createQuery(query).getResultList();
+        Order order = cb.asc(event.get("name"));
+        query.orderBy(order);
+
+        List<Event> eventsList = entityManager.createQuery(query)
+//                .setFirstResult((int) page.getOffset())
+//                .setMaxResults(page.getPageSize())
+                .getResultList();
 
         Map<Long, Long> requestsByEvent = requestRepository.countRequestByEventId(RequestStatus.CONFIRMED).stream()
-                .collect(Collectors.toMap(RequestsCountByEvent::getEventId, RequestsCountByEvent::getCount));
+                .collect(Collectors.toMap(
+                        RequestsCountByEvent::getEventId,
+                        RequestsCountByEvent::getCount)
+                );
 
+        String encodedStartDate = URLEncoder.encode(LocalDateTime.of(0, 1, 1, 0, 0)
+                .format(DATE_TIME_FORMATTER), StandardCharsets.UTF_8);
+//        String encodedStartDate = URLEncoder.encode(LocalDateTime.MIN.format(DATE_TIME_FORMATTER), StandardCharsets.UTF_8);
+        String encodedEndDate = URLEncoder.encode(LocalDateTime.now().format(DATE_TIME_FORMATTER), StandardCharsets.UTF_8);
+        List<ViewStats> viewStats = StatisticRestClient.getData(encodedStartDate, encodedEndDate, null, null);
 
-        return eventsList.stream()
-                .map(eventEntity -> EventMapper.eventToOutDto(eventEntity, 0L, requestsByEvent.get(eventEntity.getId())))
+        Map<Long, Long> viewsByEvent =
+                viewStats.stream()
+                        .filter(viewStatsLine -> viewStatsLine.getApp().equals(EWM_MAIN_SERVICE_NAME))
+                        .collect(Collectors.toMap(
+                                viewStatsLine -> {
+                                    int lastSlashIndex = viewStatsLine.getUri().lastIndexOf('/');
+                                    Long eventId = Long.valueOf(viewStatsLine.getUri().substring(lastSlashIndex + 1));
+                                    return eventId;
+                                },
+                                ViewStats::getHits
+                        ));
+
+        List<EventOutDto> eventOutDtoList = eventsList.stream()
+                .filter(currentEvent -> {
+                    if (onlyAvailable && currentEvent.getParticipantLimit() - requestsByEvent.get(currentEvent.getId()) > 0) {
+                        return true;
+                    }
+                    return true;
+                })
+                .map(eventEntity -> EventMapper.eventToOutDto(
+                        eventEntity,
+                        viewsByEvent.get(eventEntity.getId()),
+                        requestsByEvent.get(eventEntity.getId()))
+                )
                 .collect(Collectors.toList());
 
+        if (sort.isPresent()) {
+            try {
+                EventOutDtoSortBy eventOutDtoSortBy = EventOutDtoSortBy.valueOf(sort.get());
+                eventOutDtoList = eventOutDtoList.stream().sorted(eventOutDtoSortBy.getComparator()).collect(Collectors.toList());
+            } catch (IllegalArgumentException e) {
+                //TODO add custom except
+                throw new RuntimeException(e);
+            }
+        }
+        return eventOutDtoList.subList((int) page.getOffset(), page.getPageSize());
     }
 }

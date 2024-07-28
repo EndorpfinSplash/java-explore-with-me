@@ -24,7 +24,7 @@ public class EventControllerPublic {
 
     @GetMapping
     public Collection<EventOutDto> getEvents(
-            HttpServletRequest request,
+            HttpServletRequest httpServletRequest,
             @RequestParam(value = "text", required = false) final String text,
             @RequestParam(value = "categories") final List<Integer> categories,
             @RequestParam(value = "paid") final boolean paid,
@@ -35,10 +35,11 @@ public class EventControllerPublic {
             @RequestParam(value = "from", defaultValue = "0") final Integer from,
             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
 
-        log.info("client ip: {}", request.getRemoteAddr());
-        log.info("endpoint path: {}", request.getRequestURI());
-        log.info("GET request from collection of events.");
+//        log.info("client ip: {}", httpServletRequest.getRemoteAddr());
+//        log.info("endpoint path: {}", httpServletRequest.getRequestURI());
+//        log.info("GET httpServletRequest from collection of events.");
         return eventService.getPublicEvents(
+                httpServletRequest,
                 Optional.ofNullable(text),
                 Optional.ofNullable(categories),
                 Optional.of(paid),
@@ -49,11 +50,6 @@ public class EventControllerPublic {
                 from,
                 size
         );
-    }
-
-    public enum EventSortOrder {
-        EVENT_DATE,
-        VIEWS
     }
 
 }
