@@ -10,7 +10,6 @@ import ru.practicum.ewm.event_category.EventLocation;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Data
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 public class EventUpdateDto {
 
     @Min(20L)
-    @Max( 000L)
+    @Max(2000L)
     private String annotation;
 
     private Long category;

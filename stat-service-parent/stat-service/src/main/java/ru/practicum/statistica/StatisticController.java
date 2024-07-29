@@ -35,14 +35,15 @@ public class StatisticController {
     @GetMapping("/stats")
     public List<ViewStats> getStats(
 
-            @RequestParam(name = "start")
-            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-            LocalDateTime start,
+            @RequestParam(value = "start")
+//            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            String  start,
 
-            @RequestParam(name = "end")
-            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
-            @RequestParam(name = "uris", required = false) List<String> uris,
-            @RequestParam(name = "unique", required = false, defaultValue = "false") boolean unique
+            @RequestParam(value = "end")
+//            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            String end,
+            @RequestParam(value = "uris", required = false) List<String> uris,
+            @RequestParam(value = "unique", required = false, defaultValue = "false") boolean unique
     ) {
         log.info("Get events from {} to end {} for list of URIs[{}] with unique flag {}",
                 start, end, Collections.singletonList(uris), unique);

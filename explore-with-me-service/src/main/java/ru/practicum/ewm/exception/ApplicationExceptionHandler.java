@@ -48,9 +48,10 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler({
-            MethodArgumentNotValidException.class,
+//            MethodArgumentNotValidException.class,
             NumberFormatException.class,
-            IncorrectStatusException.class
+            IncorrectStatusException.class,
+            EventSortOrderNotValidException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse catchValidation(final Exception e) {

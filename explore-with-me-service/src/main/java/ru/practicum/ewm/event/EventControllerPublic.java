@@ -26,12 +26,12 @@ public class EventControllerPublic {
     public Collection<EventOutDto> getEvents(
             HttpServletRequest httpServletRequest,
             @RequestParam(value = "text", required = false) final String text,
-            @RequestParam(value = "categories") final List<Integer> categories,
-            @RequestParam(value = "paid") final boolean paid,
-            @RequestParam(value = "rangeStart") final String rangeStart,
-            @RequestParam(value = "rangeEnd") final String rangeEnd,
+            @RequestParam(value = "categories", required = false) final List<Integer> categories,
+            @RequestParam(value = "paid", required = false) final boolean paid,
+            @RequestParam(value = "rangeStart", required = false) final String rangeStart,
+            @RequestParam(value = "rangeEnd",required = false) final String rangeEnd,
             @RequestParam(value = "onlyAvailable", defaultValue = "false") final boolean onlyAvailable,
-            @RequestParam(value = "sort") final String sort,
+            @RequestParam(value = "sort", required = false) final String sort,
             @RequestParam(value = "from", defaultValue = "0") final Integer from,
             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
 

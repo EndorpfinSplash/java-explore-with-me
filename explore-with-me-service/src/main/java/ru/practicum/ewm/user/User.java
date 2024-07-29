@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 
@@ -25,6 +26,7 @@ public class User {
     private String name;
 
     @Column(unique = true, nullable = false)
+    @Length(max = 254)
     private String email;
 
 }

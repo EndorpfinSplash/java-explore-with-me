@@ -215,12 +215,8 @@ public class EventService {
         CriteriaQuery<Event> query = cb.createQuery(Event.class);
         Root<Event> event = query.from(Event.class);
 
-//        if (sort.isPresent()) {
-//            query = query.orderBy(cb.asc(event.get(sort.get())));
-//        }
-
         List<Predicate> predicates = new ArrayList<>();
-        Predicate statusPublished = cb.equal(event.get("status"), EventStatus.PUBLISHED);
+        Predicate statusPublished = cb.equal(event.get("eventStatus"), EventStatus.PUBLISHED);
         predicates.add(statusPublished);
 
         categories.ifPresent(categoriesList ->
@@ -237,9 +233,6 @@ public class EventService {
                 }
         );
 
-        Predicate isOnlyAvailablePredicate = cb.equal(event.get("onlyAvailable"), onlyAvailable);
-        predicates.add(isOnlyAvailablePredicate);
-
         text.ifPresent(
                 txt ->
                 {
@@ -251,7 +244,7 @@ public class EventService {
         );
 
         Predicate startFromPredicate =
-                cb.greaterThan(event.get("EVENT_DATE"),
+                cb.greaterThan(event.get("eventDate"),
                         rangeStart.isEmpty() ? LocalDateTime.now() :
                                 LocalDateTime.parse(rangeStart.get())
                 );
@@ -260,16 +253,13 @@ public class EventService {
         rangeEnd.ifPresent(
                 endTime -> {
                     predicates.add(
-                            cb.lessThan(event.get("EVENT_DATE"),
+                            cb.lessThan(event.get("eventDate"),
                                     LocalDateTime.parse(rangeStart.get()))
                     );
                 }
         );
 
         query.where(predicates.toArray(new Predicate[0]));
-
-        Order order = cb.asc(event.get("name"));
-        query.orderBy(order);
 
         List<Event> eventsList = entityManager.createQuery(query)
 //                .setFirstResult((int) page.getOffset())
@@ -319,8 +309,7 @@ public class EventService {
                 EventOutDtoSortBy eventOutDtoSortBy = EventOutDtoSortBy.valueOf(sort.get());
                 eventOutDtoList = eventOutDtoList.stream().sorted(eventOutDtoSortBy.getComparator()).collect(Collectors.toList());
             } catch (IllegalArgumentException e) {
-                //TODO add custom except
-                throw new RuntimeException(e);
+                throw new EventSortOrderNotValidException("Not valid event sorting order");
             }
         }
         return eventOutDtoList.subList((int) page.getOffset(), page.getPageSize());

@@ -21,10 +21,13 @@ public class StatisticService {
         return EventMapper.eventToEventOutDto(savedEvent);
     }
 
-    public List<ViewStats> getEventStatistic(LocalDateTime start,
-                                             LocalDateTime end,
+    public List<ViewStats> getEventStatistic(String  startStr,
+                                             String  endStr,
                                              List<String> uris,
                                              boolean unique) {
+        LocalDateTime start = LocalDateTime.parse(startStr);
+        LocalDateTime end = LocalDateTime.parse(endStr);
+
         if ((uris == null || uris.isEmpty()) && !unique) {
             return statisticRepository.countEvents(start, end);
         }
