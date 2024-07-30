@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event_category.dto.CategoryDto;
 import ru.practicum.ewm.event_category.dto.CategoryOutDto;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/admin/categories")
@@ -17,7 +18,7 @@ public class EventCategoryControllerAdmin {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryOutDto create(@RequestBody final CategoryDto categoryDto) {
+    public CategoryOutDto create(@RequestBody @Valid final CategoryDto categoryDto) {
         return eventCategoryService.createEventCategory(categoryDto);
     }
 
@@ -29,7 +30,7 @@ public class EventCategoryControllerAdmin {
 
     @PatchMapping("/{catId}")
     public CategoryOutDto patchById(@PathVariable("catId") Integer eventCategoryId,
-                                    @RequestBody CategoryDto categoryDto
+                                    @RequestBody @Valid CategoryDto categoryDto
     ) {
         log.info("Patch request to update event_category_id={} received.", eventCategoryId);
         return eventCategoryService.updateEventCategory(eventCategoryId, categoryDto);

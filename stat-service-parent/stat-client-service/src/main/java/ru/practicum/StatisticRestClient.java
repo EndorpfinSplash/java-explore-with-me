@@ -1,7 +1,6 @@
 package ru.practicum;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -9,7 +8,10 @@ import ru.practicum.commons.EndpointHit;
 import ru.practicum.commons.EventOutDto;
 import ru.practicum.commons.ViewStats;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -52,21 +54,22 @@ public class StatisticRestClient {
     public static List<ViewStats> getData(String start, String end, List<String> uris, String unique) {
         String requestUri = "http://" + host + ":" + port + RESOURCE_PATH_TO_GET_STATISTIC;
 
-        Map<String, String> urlParameters = new HashMap<>();
-        urlParameters.put("start", start);
-        urlParameters.put("end", end);
+        Map<String, String> uriVariables = new HashMap<>();
+        uriVariables.put("start", start);
+        uriVariables.put("end", end);
         if(uris != null && !uris.isEmpty()) {
-            urlParameters.put("uris", String.join(",", uris));
+            uriVariables.put("uris", String.join(",", uris));
         }
         if(unique != null && !unique.isEmpty()) {
-            urlParameters.put("unique", unique);
+            uriVariables.put("unique", unique);
         }
 
         ResponseEntity<ViewStats[]> events = restTemplate.getForEntity(
                 requestUri,
                 ViewStats[].class,
-                urlParameters);
-        return events.getBody() != null ? Arrays.asList(events.getBody()) :
+                uriVariables);
+
+        return events.getBody() != null ? List.of(events.getBody()) :
                 Collections.emptyList();
     }
 

@@ -5,9 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Data
 @Builder
@@ -16,7 +15,6 @@ import javax.validation.constraints.NotBlank;
 public class CategoryDto {
 
     @NotBlank(message = "Field: name. Error: must not be blank. Value: null")
-    @Min(1L)
-    @Max(50L)
+    @Size(min = 1, max = 50)
     private String name;
 }

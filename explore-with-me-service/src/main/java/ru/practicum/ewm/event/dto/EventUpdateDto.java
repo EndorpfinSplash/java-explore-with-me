@@ -5,11 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import ru.practicum.ewm.event_category.EventLocation;
 
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,18 +17,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class EventUpdateDto {
 
-    @Min(20L)
-    @Max(2000L)
+    @Length(min = 20, max = 2000)
     private String annotation;
 
     private Long category;
 
-    @Min(20L)
-    @Max(7000L)
+    @Length(min = 20, max = 7000)
     private String description;
 
 
-    @FutureOrPresent
+    @Future
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
@@ -37,11 +34,11 @@ public class EventUpdateDto {
 
     private boolean paid;
 
+    @PositiveOrZero
     private Integer participantLimit;
 
     private boolean requestModeration;
 
-    @Min(3L)
-    @Max(120L)
+    @Length(min = 3, max = 120)
     private String title;
 }

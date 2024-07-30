@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import ru.practicum.ewm.event_category.EventLocation;
 
 import javax.validation.constraints.*;
@@ -17,15 +18,13 @@ import java.time.LocalDateTime;
 public class EventCreationDto {
 
     @NotBlank
-    @Min(20L)
-    @Max(2000L)
+    @Length(min = 20, max = 2000)
     private String annotation;
 
     private Long category;
 
     @NotBlank
-    @Min(20L)
-    @Max(7000L)
+    @Length(min = 20, max = 7000)
     private String description;
 
 
@@ -45,7 +44,6 @@ public class EventCreationDto {
     private boolean requestModeration;
 
     @NotBlank
-    @Min(3L)
-    @Max(120L)
+    @Length(min = 3, max = 120)
     private String title;
 }

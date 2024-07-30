@@ -3,12 +3,10 @@ package ru.practicum.ewm.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.user.dto.UserCreationDTO;
 import ru.practicum.ewm.user.dto.UserOutputDto;
 import ru.practicum.ewm.user.dto.UserUpdateDto;
-
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -19,7 +17,6 @@ import java.util.List;
 @RequestMapping(path = "/admin/users")
 @RequiredArgsConstructor
 @Slf4j
-@Validated
 public class UserController {
     private final UserService userService;
 
@@ -48,13 +45,13 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserOutputDto createUser(@Valid @RequestBody final UserCreationDTO userCreationDTO) {
+    public UserOutputDto createUser(@RequestBody @Valid final UserCreationDTO userCreationDTO) {
         log.info("POST request to create {} received.", userCreationDTO);
         return userService.createUser(userCreationDTO);
     }
 
     @PatchMapping("/{id}")
-    public UserOutputDto updateUser(@PathVariable("id") Long id, @Valid @RequestBody final UserUpdateDto userUpdateDto) {
+    public UserOutputDto updateUser(@PathVariable("id") Long id, @RequestBody final UserUpdateDto userUpdateDto) {
         log.info("PATCH request to update user_id={} received.", id);
         return userService.updateUser(id, userUpdateDto);
     }
