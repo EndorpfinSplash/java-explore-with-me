@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event_category.dto.CategoryDto;
-import ru.practicum.ewm.event_category.dto.CategoryOutDto;
+import ru.practicum.ewm.event_category.dto.NewCategoryDto;
 import ru.practicum.ewm.exception.EventCategoryNotFoundException;
 
 import java.text.MessageFormat;
@@ -18,19 +18,19 @@ public class EventCategoryService {
 
     private final EventCategoryRepository eventCategoryRepository;
 
-    public Collection<CategoryOutDto> getAllEventCategories() {
+    public Collection<CategoryDto> getAllEventCategories() {
         return eventCategoryRepository.findAll().stream()
                 .map(EventCategoryMapper::eventCategoryToEventCategoryOutDto)
                 .collect(Collectors.toList());
     }
 
-    public CategoryOutDto createEventCategory(CategoryDto categoryDto) {
-        EventCategory eventCategory = EventCategoryMapper.categoryDtoToEventCategory(categoryDto);
+    public CategoryDto createEventCategory(NewCategoryDto newCategoryDto) {
+        EventCategory eventCategory = EventCategoryMapper.categoryDtoToEventCategory(newCategoryDto);
         EventCategory savedEventCategory = eventCategoryRepository.save(eventCategory);
         return EventCategoryMapper.eventCategoryToEventCategoryOutDto(savedEventCategory);
     }
 
-    public CategoryOutDto updateEventCategory(Integer eventCategoryId, CategoryDto eventCategoryUpdateDto) {
+    public CategoryDto updateEventCategory(Integer eventCategoryId, NewCategoryDto eventCategoryUpdateDto) {
         EventCategory eventCategoryForUpdate = eventCategoryRepository.findById(Long.valueOf(eventCategoryId)).orElseThrow(
                 () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found",
                         eventCategoryId)
@@ -41,7 +41,7 @@ public class EventCategoryService {
         return EventCategoryMapper.eventCategoryToEventCategoryOutDto(updatedEventCategory);
     }
 
-    public CategoryOutDto getEventCategoryIdById(Long eventCategoryId) {
+    public CategoryDto getEventCategoryIdById(Long eventCategoryId) {
         EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId)
                 .orElseThrow(
                         () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found",
@@ -59,14 +59,14 @@ public class EventCategoryService {
         eventCategoryRepository.deleteById(eventCategoryId);
     }
 
-    public Collection<CategoryOutDto> getEventCategories(Integer from, Integer size) {
+    public Collection<CategoryDto> getEventCategories(Integer from, Integer size) {
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
         return eventCategoryRepository.findAll(page).stream()
                 .map(EventCategoryMapper::eventCategoryToEventCategoryOutDto)
                 .collect(Collectors.toList());
     }
 
-    public CategoryOutDto findById(Integer eventCategoryId) {
+    public CategoryDto findById(Integer eventCategoryId) {
         return eventCategoryRepository.findById(Long.valueOf(eventCategoryId))
                 .map(EventCategoryMapper::eventCategoryToEventCategoryOutDto)
                 .orElseThrow(

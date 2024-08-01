@@ -15,10 +15,10 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping(path = "/events")
+@RequestMapping(path = "/admin/events")
 @RequiredArgsConstructor
 @Slf4j
-public class EventControllerPublic {
+public class EventControllerAdmin {
 
     private final EventService eventService;
 

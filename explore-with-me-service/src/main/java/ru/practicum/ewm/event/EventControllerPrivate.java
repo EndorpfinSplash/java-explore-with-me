@@ -20,35 +20,35 @@ public class EventControllerPrivate {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventOutDto createEvent(@RequestBody @Valid final EventCreationDto eventCreationDto,
-                                   @PathVariable("userId") final Long userId) {
-        log.info("Create event for user {} with event {}", userId, eventCreationDto);
-        return eventService.createEvent(userId, eventCreationDto);
+    public EventFullDto createEvent(@RequestBody @Valid final NewEventDto newEventDto,
+                                    @PathVariable("userId") final Long userId) {
+        log.info("Create event for user {} with event {}", userId, newEventDto);
+        return eventService.createEvent(userId, newEventDto);
     }
 
     @GetMapping
-    public Collection<EventOutDto> getEvents(@PathVariable("userId") final Long userId,
-                                             @RequestParam(value = "from", defaultValue = "0") final Integer from,
-                                             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
+    public Collection<EventFullDto> getEvents(@PathVariable("userId") final Long userId,
+                                              @RequestParam(value = "from", defaultValue = "0") final Integer from,
+                                              @RequestParam(value = "size", defaultValue = "10") final Integer size) {
         log.info("GET request from userId={} to fetch collection of events from = {} with size = {} received.", userId, from, size);
         return eventService.getUserEvents(userId, from, size);
     }
 
     @GetMapping("/{eventId}")
-    public EventOutDto getEventById(@PathVariable("userId") final Long userId,
-                                    @PathVariable("eventId") final Long eventId
+    public EventFullDto getEventById(@PathVariable("userId") final Long userId,
+                                     @PathVariable("eventId") final Long eventId
     ) {
         log.info("GET request from userId={} to fetch  eventId={} received.", userId, eventId);
         return eventService.getUserEventById(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")
-    public EventOutDto patchEventById(@PathVariable("userId") final Long userId,
-                                      @PathVariable("eventId") final Long eventId,
-                                      @RequestBody @Valid final EventUpdateDto eventUpdateDto
+    public EventFullDto patchEventById(@PathVariable("userId") final Long userId,
+                                       @PathVariable("eventId") final Long eventId,
+                                       @RequestBody @Valid final UpdateEventUserRequest updateEventUserRequest
     ) {
         log.info("GET request from userId={} to fetch  eventId={} received.", userId, eventId);
-        return eventService.patchUserEventById(userId, eventId, eventUpdateDto);
+        return eventService.patchUserEventById(userId, eventId, updateEventUserRequest);
     }
 
     @GetMapping("/{eventId}/requests")

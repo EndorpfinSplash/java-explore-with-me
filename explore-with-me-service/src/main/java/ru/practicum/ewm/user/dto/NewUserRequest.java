@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCreationDTO {
+public class NewUserRequest {
     @NotBlank(message = "Field: name. Error: must not be blank. Value: ")
     @Size(min = 2, max = 250)
     private String name;

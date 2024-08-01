@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EventLocation {
+public class Location {
     private double lat;
     private double lon;
 }

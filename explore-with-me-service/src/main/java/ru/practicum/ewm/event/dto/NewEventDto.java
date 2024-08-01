@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import ru.practicum.ewm.event_category.EventLocation;
+import ru.practicum.ewm.event_category.Location;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -15,30 +15,35 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventUpdateDto {
+public class NewEventDto {
 
+    @NotBlank
     @Length(min = 20, max = 2000)
     private String annotation;
 
     private Long category;
 
+    @NotBlank
     @Length(min = 20, max = 7000)
     private String description;
 
 
-    @Future
+    @FutureOrPresent
+    @NotNull(message = "The date and time must not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
-    private EventLocation location;
+    private Location location;
 
     private boolean paid;
 
-    @PositiveOrZero
-    private Integer participantLimit;
+    @Positive
+    @Builder.Default
+    private int participantLimit = 0;
 
     private boolean requestModeration;
 
+    @NotBlank
     @Length(min = 3, max = 120)
     private String title;
 }

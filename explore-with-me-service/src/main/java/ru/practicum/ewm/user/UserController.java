@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.user.dto.UserCreationDTO;
-import ru.practicum.ewm.user.dto.UserOutputDto;
+import ru.practicum.ewm.user.dto.NewUserRequest;
+import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.dto.UserUpdateDto;
 
 import javax.validation.Valid;
@@ -21,13 +21,13 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/all")
-    public Collection<UserOutputDto> getAllUsers() {
+    public Collection<UserDto> getAllUsers() {
         log.info("GET request to fetch collection of all users received.");
         return userService.getAllUsers();
     }
 
     @GetMapping
-    public Collection<UserOutputDto> getUsers(
+    public Collection<UserDto> getUsers(
             @RequestParam (required = false) List<Long> ids,
             @RequestParam(value = "from", defaultValue = "0") Integer from,
             @RequestParam(value = "size", defaultValue = "10") Integer size
@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserOutputDto getUser(@PathVariable("id") Long id) {
+    public UserDto getUser(@PathVariable("id") Long id) {
         log.info("GET request to fetch user_id={} received.", id);
         return userService.getUserById(id);
     }
@@ -45,13 +45,13 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserOutputDto createUser(@RequestBody @Valid final UserCreationDTO userCreationDTO) {
-        log.info("POST request to create {} received.", userCreationDTO);
-        return userService.createUser(userCreationDTO);
+    public UserDto createUser(@RequestBody @Valid final NewUserRequest newUserRequest) {
+        log.info("POST request to create {} received.", newUserRequest);
+        return userService.createUser(newUserRequest);
     }
 
     @PatchMapping("/{id}")
-    public UserOutputDto updateUser(@PathVariable("id") Long id, @RequestBody final UserUpdateDto userUpdateDto) {
+    public UserDto updateUser(@PathVariable("id") Long id, @RequestBody final UserUpdateDto userUpdateDto) {
         log.info("PATCH request to update user_id={} received.", id);
         return userService.updateUser(id, userUpdateDto);
     }

@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.ewm.event_category.EventCategory;
-import ru.practicum.ewm.event_category.EventLocation;
-import ru.practicum.ewm.user.User;
+import ru.practicum.ewm.event_category.Location;
+import ru.practicum.ewm.event_category.dto.CategoryDto;
+import ru.practicum.ewm.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 
@@ -15,12 +15,12 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventOutDto {
+public class EventFullDto {
     private Long id;
 
     private String annotation;
 
-    private EventCategory category;
+    private CategoryDto category;
 
     private long confirmedRequests;
 
@@ -32,9 +32,9 @@ public class EventOutDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
-    private User initiator;
+    private UserShortDto initiator;
 
-    private EventLocation location;
+    private Location location;
 
     private boolean paid;
 

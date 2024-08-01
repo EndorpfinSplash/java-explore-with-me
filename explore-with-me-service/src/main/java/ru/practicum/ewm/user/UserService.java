@@ -5,8 +5,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.exception.UserNotFoundException;
-import ru.practicum.ewm.user.dto.UserCreationDTO;
-import ru.practicum.ewm.user.dto.UserOutputDto;
+import ru.practicum.ewm.user.dto.NewUserRequest;
+import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.dto.UserUpdateDto;
 
 import java.text.MessageFormat;
@@ -20,19 +20,19 @@ public class UserService {
 
     private final UserRepository userStorage;
 
-    public Collection<UserOutputDto> getAllUsers() {
+    public Collection<UserDto> getAllUsers() {
         return userStorage.findAll().stream()
                 .map(UserMapper::toUserOutputDto)
                 .collect(Collectors.toList());
     }
 
-    public UserOutputDto createUser(UserCreationDTO userCreationDTO) {
-        User user = UserMapper.toUser(userCreationDTO);
+    public UserDto createUser(NewUserRequest newUserRequest) {
+        User user = UserMapper.toUser(newUserRequest);
         User savedUser = userStorage.save(user);
         return UserMapper.toUserOutputDto(savedUser);
     }
 
-    public UserOutputDto updateUser(Long userId, UserUpdateDto userUpdateDto) {
+    public UserDto updateUser(Long userId, UserUpdateDto userUpdateDto) {
         User userForUpdate = userStorage.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
@@ -41,7 +41,7 @@ public class UserService {
         return UserMapper.toUserOutputDto(updatedUser);
     }
 
-    public UserOutputDto getUserById(Long userId) {
+    public UserDto getUserById(Long userId) {
         User user = userStorage.findById(userId)
                 .orElseThrow(
                         () -> new UserNotFoundException(MessageFormat.format("User with userId={0} was not found", userId))
@@ -53,7 +53,7 @@ public class UserService {
         userStorage.deleteById(id);
     }
 
-    public Collection<UserOutputDto> getUsers(List<Long> ids, Integer from, Integer size) {
+    public Collection<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
         if (ids == null || ids.isEmpty()) {
             return userStorage.findAll(page).stream()

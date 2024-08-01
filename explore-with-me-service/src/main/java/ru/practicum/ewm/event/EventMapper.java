@@ -1,46 +1,54 @@
 package ru.practicum.ewm.event;
 
-import ru.practicum.ewm.event.dto.EventCreationDto;
-import ru.practicum.ewm.event.dto.EventOutDto;
-import ru.practicum.ewm.event.dto.EventUpdateDto;
+import ru.practicum.ewm.event.dto.NewEventDto;
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event_category.EventCategory;
-import ru.practicum.ewm.event_category.EventLocation;
+import ru.practicum.ewm.event_category.Location;
+import ru.practicum.ewm.event_category.dto.CategoryDto;
 import ru.practicum.ewm.user.User;
+import ru.practicum.ewm.user.dto.UserShortDto;
 
 public class EventMapper {
 
-    public static Event creationDtoToEvent(EventCreationDto eventCreationDto,
+    public static Event creationDtoToEvent(NewEventDto newEventDto,
                                            User user,
                                            EventCategory eventCategory
     ) {
         return Event.builder()
                 .user(user)
-                .annotation(eventCreationDto.getAnnotation())
+                .annotation(newEventDto.getAnnotation())
                 .category(eventCategory)
-                .description(eventCreationDto.getDescription())
-                .eventDate(eventCreationDto.getEventDate())
-                .locationLon(eventCreationDto.getLocation().getLon())
-                .locationLat(eventCreationDto.getLocation().getLat())
-                .paid(eventCreationDto.isPaid())
-                .participantLimit(eventCreationDto.getParticipantLimit())
-                .requestModeration(eventCreationDto.isRequestModeration())
-                .title(eventCreationDto.getTitle())
+                .description(newEventDto.getDescription())
+                .eventDate(newEventDto.getEventDate())
+                .locationLon(newEventDto.getLocation().getLon())
+                .locationLat(newEventDto.getLocation().getLat())
+                .paid(newEventDto.isPaid())
+                .participantLimit(newEventDto.getParticipantLimit())
+                .requestModeration(newEventDto.isRequestModeration())
+                .title(newEventDto.getTitle())
                 .eventStatus(EventStatus.WAITING)
                 .build();
     }
 
 
-    public static EventOutDto eventToOutDto(Event savedEvent, long views, long confirmedRequests) {
-        return EventOutDto.builder()
+    public static EventFullDto eventToOutDto(Event savedEvent, long views, long confirmedRequests) {
+        return EventFullDto.builder()
                 .id(savedEvent.getId())
                 .annotation(savedEvent.getAnnotation())
-                .category(savedEvent.getCategory())
+                .category(CategoryDto.builder()
+                        .id(savedEvent.getCategory().getId())
+                        .name(savedEvent.getCategory().getName())
+                        .build())
                 .confirmedRequests(confirmedRequests)
                 .createdOn(savedEvent.getCreatedOn())
                 .description(savedEvent.getDescription())
                 .eventDate(savedEvent.getEventDate())
-                .initiator(savedEvent.getUser())
-                .location(EventLocation.builder()
+                .initiator(UserShortDto.builder()
+                        .id(savedEvent.getUser().getId())
+                        .email(savedEvent.getUser().getEmail())
+                        .build())
+                .location(Location.builder()
                         .lat(savedEvent.getLocationLat())
                         .lon(savedEvent.getLocationLon())
                         .build())
@@ -54,23 +62,23 @@ public class EventMapper {
                 .build();
     }
 
-    public static EventOutDto eventToOutDto(EventUpdateDto eventUpdateDto) {
-        EventOutDto eventOutDto = new EventOutDto();
-        if (eventUpdateDto.getAnnotation() != null) {
-            eventOutDto.setAnnotation(eventUpdateDto.getAnnotation());
+    public static EventFullDto eventToOutDto(UpdateEventUserRequest updateEventUserRequest) {
+        EventFullDto eventFullDto = new EventFullDto();
+        if (updateEventUserRequest.getAnnotation() != null) {
+            eventFullDto.setAnnotation(updateEventUserRequest.getAnnotation());
         }
-        if (eventUpdateDto.getTitle() != null) {
-            eventOutDto.setTitle(eventUpdateDto.getTitle());
+        if (updateEventUserRequest.getTitle() != null) {
+            eventFullDto.setTitle(updateEventUserRequest.getTitle());
         }
-        if (eventUpdateDto.getDescription() != null) {
-            eventOutDto.setDescription(eventUpdateDto.getDescription());
+        if (updateEventUserRequest.getDescription() != null) {
+            eventFullDto.setDescription(updateEventUserRequest.getDescription());
         }
-        if (eventUpdateDto.getEventDate() != null) {
-            eventOutDto.setEventDate(eventUpdateDto.getEventDate());
+        if (updateEventUserRequest.getEventDate() != null) {
+            eventFullDto.setEventDate(updateEventUserRequest.getEventDate());
         }
-        if (eventUpdateDto.getLocation() != null) {
-            eventOutDto.setLocation(eventUpdateDto.getLocation());
+        if (updateEventUserRequest.getLocation() != null) {
+            eventFullDto.setLocation(updateEventUserRequest.getLocation());
         }
-        return eventOutDto;
+        return eventFullDto;
     }
 }

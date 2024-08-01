@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event_category.dto.CategoryDto;
-import ru.practicum.ewm.event_category.dto.CategoryOutDto;
+import ru.practicum.ewm.event_category.dto.NewCategoryDto;
+
 import javax.validation.Valid;
 
 @RestController
@@ -18,8 +19,8 @@ public class EventCategoryControllerAdmin {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryOutDto create(@RequestBody @Valid final CategoryDto categoryDto) {
-        return eventCategoryService.createEventCategory(categoryDto);
+    public CategoryDto create(@RequestBody @Valid final NewCategoryDto newCategoryDto) {
+        return eventCategoryService.createEventCategory(newCategoryDto);
     }
 
     @DeleteMapping("/{catId}")
@@ -29,11 +30,11 @@ public class EventCategoryControllerAdmin {
     }
 
     @PatchMapping("/{catId}")
-    public CategoryOutDto patchById(@PathVariable("catId") Integer eventCategoryId,
-                                    @RequestBody @Valid CategoryDto categoryDto
+    public CategoryDto patchById(@PathVariable("catId") Integer eventCategoryId,
+                                    @RequestBody @Valid NewCategoryDto newCategoryDto
     ) {
         log.info("Patch request to update event_category_id={} received.", eventCategoryId);
-        return eventCategoryService.updateEventCategory(eventCategoryId, categoryDto);
+        return eventCategoryService.updateEventCategory(eventCategoryId, newCategoryDto);
     }
 
 }

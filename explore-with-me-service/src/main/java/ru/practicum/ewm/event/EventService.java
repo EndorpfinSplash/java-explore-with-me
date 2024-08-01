@@ -19,8 +19,6 @@ import ru.practicum.ewm.user.UserRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
 import javax.servlet.http.HttpServletRequest;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,28 +37,28 @@ public class EventService {
     private final RequestRepository requestRepository;
     private final EntityManager entityManager;
 
-    public EventOutDto createEvent(Long userId, EventCreationDto eventCreationDto) {
+    public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
 
-        Long eventCategoryId = eventCreationDto.getCategory();
+        Long eventCategoryId = newEventDto.getCategory();
         EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(
                 () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found",
                         eventCategoryId)
                 )
         );
-        if (eventCreationDto.getEventDate().minusHours(2L).isBefore(LocalDateTime.now())) {
+        if (newEventDto.getEventDate().minusHours(2L).isBefore(LocalDateTime.now())) {
             throw new EventNotValidArgumentException("Event should be announced 2 hours earlier then event");
         }
-        Event eventForSave = EventMapper.creationDtoToEvent(eventCreationDto, user, eventCategory);
+        Event eventForSave = EventMapper.creationDtoToEvent(newEventDto, user, eventCategory);
         Event savedEvent = eventRepository.save(eventForSave);
         return EventMapper.eventToOutDto(savedEvent, 0L, 0L);
     }
 
 
-    public Collection<EventOutDto> getUserEvents(Long userId, Integer from, Integer size) {
-        User user = userRepository.findById(userId).orElseThrow(
+    public Collection<EventFullDto> getUserEvents(Long userId, Integer from, Integer size) {
+        userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
@@ -73,7 +71,7 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    public EventOutDto getUserEventById(Long userId, Long eventId) {
+    public EventFullDto getUserEventById(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
@@ -85,7 +83,7 @@ public class EventService {
         return EventMapper.eventToOutDto(eventByUserAndId, 0L, 0L);
     }
 
-    public EventOutDto patchUserEventById(Long userId, Long eventId, EventUpdateDto eventUpdateDto) {
+    public EventFullDto patchUserEventById(Long userId, Long eventId, UpdateEventUserRequest updateEventUserRequest) {
 
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
@@ -101,11 +99,11 @@ public class EventService {
             throw new NotApplicableEvent("Only pending or canceled events can be changed");
         }
 
-        if (eventUpdateDto.getEventDate() != null && eventUpdateDto.getEventDate().minusHours(2L).isBefore(LocalDateTime.now())) {
+        if (updateEventUserRequest.getEventDate() != null && updateEventUserRequest.getEventDate().minusHours(2L).isBefore(LocalDateTime.now())) {
             throw new EventNotValidArgumentException("Event should be announced 2 hours earlier then event");
         }
 
-        Long eventCategoryId = eventUpdateDto.getCategory();
+        Long eventCategoryId = updateEventUserRequest.getCategory();
         if (eventCategoryId != null) {
             EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(
                     () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found",
@@ -114,14 +112,14 @@ public class EventService {
             );
             eventForUpdate.setCategory(eventCategory);
         }
-        return EventMapper.eventToOutDto(eventUpdateDto);
+        return EventMapper.eventToOutDto(updateEventUserRequest);
     }
 
     public List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
         );
-        Event event = eventRepository.findEventByUserAndId(user, eventId)
+        eventRepository.findEventByUserAndId(user, eventId)
                 .orElseThrow(
                         () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
                 );
@@ -192,16 +190,16 @@ public class EventService {
         );
     }
 
-    public List<EventOutDto> getPublicEvents(HttpServletRequest httpServletRequest,
-                                             Optional<String> text,
-                                             Optional<List<Integer>> categories,
-                                             Optional<Boolean> paid,
-                                             Optional<String> rangeStart,
-                                             Optional<String> rangeEnd,
-                                             boolean onlyAvailable,
-                                             Optional<String> sort,
-                                             Integer from,
-                                             Integer size
+    public List<EventFullDto> getPublicEvents(HttpServletRequest httpServletRequest,
+                                              Optional<String> text,
+                                              Optional<List<Integer>> categories,
+                                              Optional<Boolean> paid,
+                                              Optional<String> rangeStart,
+                                              Optional<String> rangeEnd,
+                                              boolean onlyAvailable,
+                                              Optional<String> sort,
+                                              Integer from,
+                                              Integer size
     ) {
         EndpointHit endpointHit = EndpointHit.builder()
                 .app(EWM_MAIN_SERVICE_NAME)
@@ -289,7 +287,7 @@ public class EventService {
                                 ViewStats::getHits
                         ));
 
-        List<EventOutDto> eventOutDtoList = eventsList.stream()
+        List<EventFullDto> eventFullDtoList = eventsList.stream()
                 .filter(currentEvent -> {
                     if (onlyAvailable && currentEvent.getParticipantLimit() - requestsByEvent.get(currentEvent.getId()) > 0) {
                         return true;
@@ -306,11 +304,11 @@ public class EventService {
         if (sort.isPresent()) {
             try {
                 EventOutDtoSortBy eventOutDtoSortBy = EventOutDtoSortBy.valueOf(sort.get());
-                eventOutDtoList = eventOutDtoList.stream().sorted(eventOutDtoSortBy.getComparator()).collect(Collectors.toList());
+                eventFullDtoList = eventFullDtoList.stream().sorted(eventOutDtoSortBy.getComparator()).collect(Collectors.toList());
             } catch (IllegalArgumentException e) {
                 throw new EventSortOrderNotValidException("Not valid event sorting order");
             }
         }
-        return eventOutDtoList.subList((int) page.getOffset(), Math.min(page.getPageSize(), eventOutDtoList.size()));
+        return eventFullDtoList.subList((int) page.getOffset(), Math.min(page.getPageSize(), eventFullDtoList.size()));
     }
 }

@@ -7,8 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class UserOutputDto {
+public class UserShortDto {
     private Long id;
-    private String name;
     private String email;
 }
