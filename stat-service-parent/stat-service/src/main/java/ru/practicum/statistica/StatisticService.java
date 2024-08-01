@@ -6,6 +6,8 @@ import ru.practicum.commons.EndpointHit;
 import ru.practicum.commons.EventOutDto;
 import ru.practicum.commons.ViewStats;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,12 +24,14 @@ public class StatisticService {
         return EventMapper.eventToEventOutDto(savedEvent);
     }
 
-    public List<ViewStats> getEventStatistic(String  startStr,
-                                             String  endStr,
+    public List<ViewStats> getEventStatistic(String startStr,
+                                             String endStr,
                                              List<String> uris,
                                              boolean unique) {
-        LocalDateTime start = LocalDateTime.parse(startStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        LocalDateTime end = LocalDateTime.parse(endStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime start = LocalDateTime.parse(URLDecoder.decode(startStr, StandardCharsets.UTF_8),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime end = LocalDateTime.parse(URLDecoder.decode(endStr, StandardCharsets.UTF_8),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         if ((uris == null || uris.isEmpty()) && !unique) {
             return statisticRepository.countEvents(start, end);

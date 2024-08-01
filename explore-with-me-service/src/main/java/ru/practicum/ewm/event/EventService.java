@@ -272,15 +272,14 @@ public class EventService {
                         RequestsCountByEvent::getCount)
                 );
 
-        String encodedStartDate = URLEncoder.encode(LocalDateTime.of(0, 1, 1, 0, 0)
-                .format(DATE_TIME_FORMATTER), StandardCharsets.UTF_8);
-//        String encodedStartDate = URLEncoder.encode(LocalDateTime.MIN.format(DATE_TIME_FORMATTER), StandardCharsets.UTF_8);
-        String encodedEndDate = URLEncoder.encode(LocalDateTime.now().format(DATE_TIME_FORMATTER), StandardCharsets.UTF_8);
-        List<ViewStats> viewStats = StatisticRestClient.getData(encodedStartDate, encodedEndDate, null, null);
+        String startDate = LocalDateTime.of(0, 1, 1, 0, 0).format(DATE_TIME_FORMATTER);
+        String endDate = LocalDateTime.now().format(DATE_TIME_FORMATTER);
+        List<ViewStats> viewStats = StatisticRestClient.getData(startDate, endDate, null, null);
 
         Map<Long, Long> viewsByEvent =
                 viewStats.stream()
                         .filter(viewStatsLine -> viewStatsLine.getApp().equals(EWM_MAIN_SERVICE_NAME))
+                        .filter(viewStats1 -> viewStats1.getUri().startsWith("/events/"))
                         .collect(Collectors.toMap(
                                 viewStatsLine -> {
                                     int lastSlashIndex = viewStatsLine.getUri().lastIndexOf('/');
@@ -312,6 +311,6 @@ public class EventService {
                 throw new EventSortOrderNotValidException("Not valid event sorting order");
             }
         }
-        return eventOutDtoList.subList((int) page.getOffset(), page.getPageSize());
+        return eventOutDtoList.subList((int) page.getOffset(), Math.min(page.getPageSize(), eventOutDtoList.size()));
     }
 }
