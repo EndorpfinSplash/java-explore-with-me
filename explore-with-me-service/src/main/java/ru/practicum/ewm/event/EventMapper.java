@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event;
 
+import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
@@ -32,7 +33,7 @@ public class EventMapper {
     }
 
 
-    public static EventFullDto eventToOutDto(Event savedEvent, long views, long confirmedRequests) {
+    public static EventFullDto eventToFullDto(Event savedEvent, long views, long confirmedRequests) {
         return EventFullDto.builder()
                 .id(savedEvent.getId())
                 .annotation(savedEvent.getAnnotation())
@@ -62,7 +63,7 @@ public class EventMapper {
                 .build();
     }
 
-    public static EventFullDto eventToOutDto(UpdateEventUserRequest updateEventUserRequest) {
+    public static EventFullDto eventToFullDto(UpdateEventUserRequest updateEventUserRequest) {
         EventFullDto eventFullDto = new EventFullDto();
         if (updateEventUserRequest.getAnnotation() != null) {
             eventFullDto.setAnnotation(updateEventUserRequest.getAnnotation());
@@ -80,5 +81,26 @@ public class EventMapper {
             eventFullDto.setLocation(updateEventUserRequest.getLocation());
         }
         return eventFullDto;
+    }
+
+    public static EventShortDto eventToShortDto(Event event, Long views, Long confirmedRequests) {
+        return EventShortDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(CategoryDto.builder()
+                        .id(event.getCategory().getId())
+                        .name(event.getCategory().getName())
+                        .build())
+                .confirmedRequests(confirmedRequests)
+                .eventDate(event.getEventDate())
+                .initiator(UserShortDto.builder()
+                        .id(event.getUser().getId())
+                        .email(event.getUser().getEmail())
+                        .build())
+                .paid(event.isPaid())
+                .participantLimit(event.getParticipantLimit())
+                .title(event.getTitle())
+                .views(views)
+                .build();
     }
 }

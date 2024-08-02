@@ -9,7 +9,7 @@ import java.util.Comparator;
 
 @Getter
 @AllArgsConstructor
-public enum EventOutDtoSortBy {
+public enum EventFullDtoSortBy {
     EVENT_DATE(Comparator.comparing(EventFullDto::getEventDate)),
     VIEWS(Comparator.comparingLong(EventFullDto::getViews));
 

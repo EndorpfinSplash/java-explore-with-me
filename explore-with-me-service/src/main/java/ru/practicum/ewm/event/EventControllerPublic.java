@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -23,7 +23,7 @@ public class EventControllerPublic {
     private final EventService eventService;
 
     @GetMapping
-    public Collection<EventFullDto> getEvents(
+    public Collection<EventShortDto> getEvents(
             HttpServletRequest httpServletRequest,
             @RequestParam(value = "text", required = false) final String text,
             @RequestParam(value = "categories", required = false) final List<Integer> categories,

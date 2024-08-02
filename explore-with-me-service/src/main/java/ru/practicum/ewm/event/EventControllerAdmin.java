@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.event.dto.EventFullDto;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -23,30 +22,22 @@ public class EventControllerAdmin {
     private final EventService eventService;
 
     @GetMapping
-    public Collection<EventFullDto> getEvents(
-            HttpServletRequest httpServletRequest,
-            @RequestParam(value = "text", required = false) final String text,
+    public Collection<EventFullDto> getAdminEvents(
+            @RequestParam(value = "users", required = false) final List<Integer> users,
+            @RequestParam(value = "states", required = false) final List<String > states,
             @RequestParam(value = "categories", required = false) final List<Integer> categories,
-            @RequestParam(value = "paid", required = false) final boolean paid,
             @RequestParam(value = "rangeStart", required = false) final String rangeStart,
             @RequestParam(value = "rangeEnd",required = false) final String rangeEnd,
-            @RequestParam(value = "onlyAvailable", defaultValue = "false") final boolean onlyAvailable,
-            @RequestParam(value = "sort", required = false) final String sort,
+
             @RequestParam(value = "from", defaultValue = "0") final Integer from,
             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
 
-//        log.info("client ip: {}", httpServletRequest.getRemoteAddr());
-//        log.info("endpoint path: {}", httpServletRequest.getRequestURI());
-//        log.info("GET httpServletRequest from collection of events.");
-        return eventService.getPublicEvents(
-                httpServletRequest,
-                Optional.ofNullable(text),
+        return eventService.getAdminEvents(
+                Optional.ofNullable(users),
+                Optional.ofNullable(states),
                 Optional.ofNullable(categories),
-                Optional.of(paid),
                 Optional.ofNullable(rangeStart),
                 Optional.ofNullable(rangeEnd),
-                onlyAvailable,
-                Optional.ofNullable(sort),
                 from,
                 size
         );
