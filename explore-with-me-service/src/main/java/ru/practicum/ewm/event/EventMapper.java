@@ -28,7 +28,7 @@ public class EventMapper {
                 .participantLimit(newEventDto.getParticipantLimit())
                 .requestModeration(newEventDto.isRequestModeration())
                 .title(newEventDto.getTitle())
-                .eventStatus(EventStatus.WAITING)
+                .eventStatus(EventStatus.PENDING)
                 .build();
     }
 
@@ -61,26 +61,6 @@ public class EventMapper {
                 .title(savedEvent.getTitle())
                 .views(views)
                 .build();
-    }
-
-    public static EventFullDto eventToFullDto(UpdateEventUserRequest updateEventUserRequest) {
-        EventFullDto eventFullDto = new EventFullDto();
-        if (updateEventUserRequest.getAnnotation() != null) {
-            eventFullDto.setAnnotation(updateEventUserRequest.getAnnotation());
-        }
-        if (updateEventUserRequest.getTitle() != null) {
-            eventFullDto.setTitle(updateEventUserRequest.getTitle());
-        }
-        if (updateEventUserRequest.getDescription() != null) {
-            eventFullDto.setDescription(updateEventUserRequest.getDescription());
-        }
-        if (updateEventUserRequest.getEventDate() != null) {
-            eventFullDto.setEventDate(updateEventUserRequest.getEventDate());
-        }
-        if (updateEventUserRequest.getLocation() != null) {
-            eventFullDto.setLocation(updateEventUserRequest.getLocation());
-        }
-        return eventFullDto;
     }
 
     public static EventShortDto eventToShortDto(Event event, Long views, Long confirmedRequests) {

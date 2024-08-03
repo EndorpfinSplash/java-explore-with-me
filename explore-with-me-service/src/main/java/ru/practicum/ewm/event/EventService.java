@@ -72,12 +72,22 @@ public class EventService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId)));
         //TODO define views and confirms
         Event eventForUpdate = eventRepository.findEventByUserAndId(user, eventId).orElseThrow(() -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId)));
-        if (!(eventForUpdate.getEventStatus() == EventStatus.WAITING || eventForUpdate.getEventStatus() == EventStatus.CANCELED)) {
+        if (!(eventForUpdate.getEventStatus() == EventStatus.PENDING || eventForUpdate.getEventStatus() == EventStatus.CANCELED)) {
             throw new NotApplicableEvent("Only pending or canceled events can be changed");
+        }
+
+        if (eventForUpdate.getEventStatus() == EventStatus.PENDING &&
+                updateEventUserRequest.getStateAction() == UpdateEventUserRequest.StateAction.CANCEL_REVIEW) {
+            eventForUpdate.setEventStatus(EventStatus.CANCELED);
         }
 
         if (updateEventUserRequest.getEventDate() != null && updateEventUserRequest.getEventDate().minusHours(2L).isBefore(LocalDateTime.now())) {
             throw new EventNotValidArgumentException("Event should be announced 2 hours earlier then event");
+        }
+
+        if (eventForUpdate.getEventStatus() == EventStatus.CANCELED &&
+                updateEventUserRequest.getStateAction() == UpdateEventUserRequest.StateAction.SEND_TO_REVIEW) {
+            eventForUpdate.setEventStatus(EventStatus.PENDING);
         }
 
         Long eventCategoryId = updateEventUserRequest.getCategory();
@@ -85,7 +95,26 @@ public class EventService {
             EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(() -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found", eventCategoryId)));
             eventForUpdate.setCategory(eventCategory);
         }
-        return EventMapper.eventToFullDto(updateEventUserRequest);
+
+        if (updateEventUserRequest.getAnnotation() != null) {
+            eventForUpdate.setAnnotation(updateEventUserRequest.getAnnotation());
+        }
+        if (updateEventUserRequest.getTitle() != null) {
+            eventForUpdate.setTitle(updateEventUserRequest.getTitle());
+        }
+        if (updateEventUserRequest.getDescription() != null) {
+            eventForUpdate.setDescription(updateEventUserRequest.getDescription());
+        }
+        if (updateEventUserRequest.getEventDate() != null) {
+            eventForUpdate.setEventDate(updateEventUserRequest.getEventDate());
+        }
+        if (updateEventUserRequest.getLocation() != null) {
+            eventForUpdate.setLocationLat(updateEventUserRequest.getLocation().getLat());
+            eventForUpdate.setLocationLon(updateEventUserRequest.getLocation().getLon());
+        }
+
+        Event savedEvent = eventRepository.save(eventForUpdate);
+        return EventMapper.eventToFullDto(savedEvent,0L, 0L);
     }
 
     public List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId) {
@@ -128,6 +157,7 @@ public class EventService {
         EventRequestStatusUpdateResult eventRequestStatusUpdateResult = new EventRequestStatusUpdateResult();
         eventRequestStatusUpdateResult.setConfirmedRequests(requestRepository.getAllByStatusOrderById(RequestStatus.CONFIRMED));
         eventRequestStatusUpdateResult.setRejectedRequests(requestRepository.getAllByStatusOrderById(RequestStatus.REJECTED));
+//        requestRepository.save(eventRequestStatusUpdateResult);
         return eventRequestStatusUpdateResult;
     }
 
@@ -287,5 +317,49 @@ public class EventService {
         return eventFullDtoList.subList((int) page.getOffset(),
                 Math.min(page.getPageSize(), eventFullDtoList.size())
         );
+    }
+
+    public EventFullDto patchAdminEventById(Long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
+        Event eventForUpdate = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId)));
+
+        if (updateEventAdminRequest.getEventDate() != null && updateEventAdminRequest.getEventDate().minusHours(1L).isBefore(LocalDateTime.now())) {
+            throw new EventNotValidArgumentException("Event should be announced 1 hours earlier then event");
+        }
+
+        if (eventForUpdate.getEventStatus() == EventStatus.PENDING &&
+                updateEventAdminRequest.getStateAction() == UpdateEventAdminRequest.StateAction.PUBLISH_EVENT) {
+            eventForUpdate.setEventStatus(EventStatus.PUBLISHED);
+        }
+
+        if (eventForUpdate.getEventStatus() != EventStatus.PUBLISHED &&
+                updateEventAdminRequest.getStateAction() == UpdateEventAdminRequest.StateAction.REJECT_EVENT) {
+            eventForUpdate.setEventStatus(EventStatus.CANCELED);
+        }
+
+        Long eventCategoryId = updateEventAdminRequest.getCategory();
+        if (eventCategoryId != null) {
+            EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(() -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found", eventCategoryId)));
+            eventForUpdate.setCategory(eventCategory);
+        }
+
+        if (updateEventAdminRequest.getAnnotation() != null) {
+            eventForUpdate.setAnnotation(updateEventAdminRequest.getAnnotation());
+        }
+        if (updateEventAdminRequest.getTitle() != null) {
+            eventForUpdate.setTitle(updateEventAdminRequest.getTitle());
+        }
+        if (updateEventAdminRequest.getDescription() != null) {
+            eventForUpdate.setDescription(updateEventAdminRequest.getDescription());
+        }
+        if (updateEventAdminRequest.getEventDate() != null) {
+            eventForUpdate.setEventDate(updateEventAdminRequest.getEventDate());
+        }
+        if (updateEventAdminRequest.getLocation() != null) {
+            eventForUpdate.setLocationLat(updateEventAdminRequest.getLocation().getLat());
+            eventForUpdate.setLocationLon(updateEventAdminRequest.getLocation().getLon());
+        }
+
+        Event savedEvent = eventRepository.save(eventForUpdate);
+        return EventMapper.eventToFullDto(savedEvent,0L, 0L);
     }
 }
