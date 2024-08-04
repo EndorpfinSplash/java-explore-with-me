@@ -13,13 +13,13 @@ public class RequestMapper {
                 .build();
     }
 
-    public static ParticipationRequestDto RequestToOutDto(Request request) {
+    public static ParticipationRequestDto requestToParticipationRequestDto(Request request) {
         return ParticipationRequestDto.builder()
                 .created(request.getCreated())
                 .event(request.getEvent().getId())
                 .id(request.getId())
                 .requester(request.getRequester().getId())
+                .status(request.getStatus().name())
                 .build();
-
     }
 }

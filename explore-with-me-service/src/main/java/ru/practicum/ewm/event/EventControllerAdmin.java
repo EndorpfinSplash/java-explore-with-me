@@ -2,16 +2,9 @@ package ru.practicum.ewm.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
-import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -27,7 +20,7 @@ public class EventControllerAdmin {
 
     private final EventService eventService;
 
-    @GetMapping
+    @GetMapping(produces = "application/json")
     public Collection<EventFullDto> getAdminEvents(
             @RequestParam(value = "users", required = false) final List<Integer> users,
             @RequestParam(value = "states", required = false) final List<String> states,

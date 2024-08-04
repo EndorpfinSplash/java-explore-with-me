@@ -17,7 +17,10 @@ import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserRepository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -114,17 +117,21 @@ public class EventService {
         }
 
         Event savedEvent = eventRepository.save(eventForUpdate);
-        return EventMapper.eventToFullDto(savedEvent,0L, 0L);
+        return EventMapper.eventToFullDto(savedEvent, 0L, 0L);
     }
 
     public List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId)));
         eventRepository.findEventByUserAndId(user, eventId).orElseThrow(() -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId)));
 
-        return requestRepository.findRequestByEventId(eventId).stream().map(RequestMapper::RequestToOutDto).collect(Collectors.toList());
+        return requestRepository.findRequestByEventId(eventId).stream()
+                .map(RequestMapper::requestToParticipationRequestDto)
+                .collect(Collectors.toList());
     }
 
-    public EventRequestStatusUpdateResult patchRequests(final Long userId, final Long eventId, final EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+    public EventRequestStatusUpdateResult patchRequests(final Long userId,
+                                                        final Long eventId,
+                                                        EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
 
         RequestStatus newStatus;
         try {
@@ -155,9 +162,17 @@ public class EventService {
         }
 
         EventRequestStatusUpdateResult eventRequestStatusUpdateResult = new EventRequestStatusUpdateResult();
-        eventRequestStatusUpdateResult.setConfirmedRequests(requestRepository.getAllByStatusOrderById(RequestStatus.CONFIRMED));
-        eventRequestStatusUpdateResult.setRejectedRequests(requestRepository.getAllByStatusOrderById(RequestStatus.REJECTED));
-//        requestRepository.save(eventRequestStatusUpdateResult);
+        eventRequestStatusUpdateResult.setConfirmedRequests(
+                requestRepository.getAllByStatusOrderById(RequestStatus.CONFIRMED).stream()
+                        .map(RequestMapper::requestToParticipationRequestDto)
+                        .collect(Collectors.toList())
+        );
+        eventRequestStatusUpdateResult.setRejectedRequests(
+                requestRepository.getAllByStatusOrderById(RequestStatus.REJECTED).stream()
+                        .map(RequestMapper::requestToParticipationRequestDto)
+                        .collect(Collectors.toList())
+        );
+
         return eventRequestStatusUpdateResult;
     }
 
@@ -229,11 +244,19 @@ public class EventService {
         }, ViewStats::getHits));
 
         List<EventShortDto> eventShortDtoList = eventsList.stream().filter(currentEvent -> {
-            if (onlyAvailable && currentEvent.getParticipantLimit() - confirmedRequestsByEvent.get(currentEvent.getId()) > 0) {
-                return true;
-            }
-            return true;
-        }).map(eventEntity -> EventMapper.eventToShortDto(eventEntity, viewsByEvent.get(eventEntity.getId()), confirmedRequestsByEvent.get(eventEntity.getId()))).collect(Collectors.toList());
+                    if (onlyAvailable && currentEvent.getParticipantLimit() - confirmedRequestsByEvent.get(currentEvent.getId()) > 0) {
+                        return true;
+                    }
+                    return true;
+                })
+                .map(eventEntity -> EventMapper.eventToShortDto(eventEntity,
+                                viewsByEvent.get(eventEntity.getId()) == null ?
+                                        0 : viewsByEvent.get(eventEntity.getId()),
+                                confirmedRequestsByEvent.get(eventEntity.getId()) == null ?
+                                        0 : confirmedRequestsByEvent.get(eventEntity.getId())
+                        )
+                )
+                .collect(Collectors.toList());
 
         if (sort.isPresent()) {
             try {
@@ -268,10 +291,10 @@ public class EventService {
         });
 
         states.ifPresent(statesIds -> {
-            List<EventStatus> eventStatuses = statesIds.stream()
-                    .map(EventStatus::valueOf)
-                    .collect(Collectors.toList());
-            Predicate statusesPredicate = event.get("eventStatus").in(eventStatuses);
+                    List<EventStatus> eventStatuses = statesIds.stream()
+                            .map(EventStatus::valueOf)
+                            .collect(Collectors.toList());
+                    Predicate statusesPredicate = event.get("eventStatus").in(eventStatuses);
                     predicates.add(statusesPredicate);
                 }
         );
@@ -282,11 +305,11 @@ public class EventService {
         });
 
         Predicate startFromPredicate = cb.greaterThan(event.get("eventDate"),
-                rangeStart.isEmpty() ? LocalDateTime.now() : LocalDateTime.parse(rangeStart.get(),DATE_TIME_FORMATTER));
+                rangeStart.isEmpty() ? LocalDateTime.now() : LocalDateTime.parse(rangeStart.get(), DATE_TIME_FORMATTER));
         predicates.add(startFromPredicate);
 
         rangeEnd.ifPresent(endTime -> {
-            predicates.add(cb.lessThan(event.get("eventDate"), LocalDateTime.parse(rangeEnd.get(),DATE_TIME_FORMATTER)));
+            predicates.add(cb.lessThan(event.get("eventDate"), LocalDateTime.parse(rangeEnd.get(), DATE_TIME_FORMATTER)));
         });
 
         query.where(predicates.toArray(new Predicate[0]));
@@ -304,15 +327,20 @@ public class EventService {
                 .filter(viewStatsLine -> viewStatsLine.getApp().equals(EWM_MAIN_SERVICE_NAME))
                 .filter(viewStats1 -> viewStats1.getUri().startsWith("/events/"))
                 .collect(Collectors.toMap(viewStatsLine -> {
-            int lastSlashIndex = viewStatsLine.getUri().lastIndexOf('/');
-            Long eventId = Long.valueOf(viewStatsLine.getUri().substring(lastSlashIndex + 1));
-            return eventId;
-        }, viewStatsEntity -> viewStatsEntity.getHits()==null?0L:viewStatsEntity.getHits()));
+                    int lastSlashIndex = viewStatsLine.getUri().lastIndexOf('/');
+                    Long eventId = Long.valueOf(viewStatsLine.getUri().substring(lastSlashIndex + 1));
+                    return eventId;
+                }, viewStatsEntity -> viewStatsEntity.getHits() == null ? 0L : viewStatsEntity.getHits()));
 
         List<EventFullDto> eventFullDtoList = eventsList.stream()
-                .map(eventEntity -> EventMapper.eventToFullDto(eventEntity,
-                        viewsByEvent.get(eventEntity.getId()),
-                        confirmedRequestsByEvent.get(eventEntity.getId()))).collect(Collectors.toList());
+                .map(
+                        eventEntity -> EventMapper.eventToFullDto(
+                                eventEntity,
+                                viewsByEvent.get(eventEntity.getId()),
+                                confirmedRequestsByEvent.get(eventEntity.getId())
+                        )
+                )
+                .collect(Collectors.toList());
 
         return eventFullDtoList.subList((int) page.getOffset(),
                 Math.min(page.getPageSize(), eventFullDtoList.size())
@@ -360,6 +388,6 @@ public class EventService {
         }
 
         Event savedEvent = eventRepository.save(eventForUpdate);
-        return EventMapper.eventToFullDto(savedEvent,0L, 0L);
+        return EventMapper.eventToFullDto(savedEvent, 0L, 0L);
     }
 }

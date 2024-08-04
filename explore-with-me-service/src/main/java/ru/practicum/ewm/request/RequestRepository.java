@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.practicum.ewm.event.Event;
-import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.user.User;
 
 import java.util.Collection;
@@ -17,11 +16,11 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     int countRequestByEventAndStatus(Event event, RequestStatus requestStatus);
 
-    Collection<ParticipationRequestDto> getAllByRequesterIdOrderById(Long userId);
+    Collection<Request> getAllByRequesterIdOrderById(Long userId);
 
     Collection<Request> findRequestByEventId(Long eventId);
 
-    List<ParticipationRequestDto> getAllByStatusOrderById(RequestStatus status);
+    List<Request> getAllByStatusOrderById(RequestStatus status);
 
     @Query("select new ru.practicum.ewm.request.RequestsCountByEvent(r.event.id, count(r.requester))" +
             "from Request as r "+

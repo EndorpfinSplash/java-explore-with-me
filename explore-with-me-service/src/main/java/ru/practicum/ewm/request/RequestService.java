@@ -14,6 +14,7 @@ import ru.practicum.ewm.user.UserRepository;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,11 +68,13 @@ public class RequestService {
 
         Request savedRequest = requestRepository.save(request);
         log.info("Request={} is created", savedRequest);
-        return RequestMapper.RequestToOutDto(savedRequest);
+        return RequestMapper.requestToParticipationRequestDto(savedRequest);
     }
 
     public Collection<ParticipationRequestDto> getAllRequest(Long userId) {
-        return requestRepository.getAllByRequesterIdOrderById(userId);
+        return requestRepository.getAllByRequesterIdOrderById(userId).stream()
+                .map(RequestMapper::requestToParticipationRequestDto)
+                .collect(Collectors.toList());
     }
 
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
@@ -88,6 +91,6 @@ public class RequestService {
         }
         request.setStatus(RequestStatus.REJECTED);
         Request savedRequest = requestRepository.save(request);
-        return RequestMapper.RequestToOutDto(savedRequest);
+        return RequestMapper.requestToParticipationRequestDto(savedRequest);
     }
 }
