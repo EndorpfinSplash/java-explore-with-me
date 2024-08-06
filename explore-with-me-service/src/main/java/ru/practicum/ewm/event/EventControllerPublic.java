@@ -2,10 +2,8 @@ package ru.practicum.ewm.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +27,7 @@ public class EventControllerPublic {
             @RequestParam(value = "categories", required = false) final List<Integer> categories,
             @RequestParam(value = "paid", required = false) final boolean paid,
             @RequestParam(value = "rangeStart", required = false) final String rangeStart,
-            @RequestParam(value = "rangeEnd",required = false) final String rangeEnd,
+            @RequestParam(value = "rangeEnd", required = false) final String rangeEnd,
             @RequestParam(value = "onlyAvailable", defaultValue = "false") final boolean onlyAvailable,
             @RequestParam(value = "sort", required = false) final String sort,
             @RequestParam(value = "from", defaultValue = "0") final Integer from,
@@ -49,6 +47,16 @@ public class EventControllerPublic {
                 Optional.ofNullable(sort),
                 from,
                 size
+        );
+    }
+
+    @GetMapping("/{id}")
+    public EventFullDto getEventById(@PathVariable(value = "id") final Long id,
+                                     HttpServletRequest httpServletRequest
+    ) {
+        return eventService.getEventById(
+                httpServletRequest,
+                id
         );
     }
 

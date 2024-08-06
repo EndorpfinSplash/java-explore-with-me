@@ -27,7 +27,6 @@ public class NewEventDto {
     @Length(min = 20, max = 7000)
     private String description;
 
-
     @FutureOrPresent
     @NotNull(message = "The date and time must not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

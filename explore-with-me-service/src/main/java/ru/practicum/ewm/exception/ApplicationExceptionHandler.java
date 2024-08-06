@@ -3,7 +3,6 @@ package ru.practicum.ewm.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,8 +20,8 @@ public class ApplicationExceptionHandler {
 //            ParticipantsLimitationException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse catchUniqueConstraint(final Exception e) {
-        return new ErrorResponse("CONFLICT",
+    public ApiError catchUniqueConstraint(final Exception e) {
+        return new ApiError("CONFLICT",
                 "Integrity constraint has been violated.",
                 e.getMessage());
     }
@@ -31,8 +30,8 @@ public class ApplicationExceptionHandler {
             ParticipantsLimitationException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse catchParticipantsChecks(final Exception e) {
-        return new ErrorResponse("CONFLICT",
+    public ApiError catchParticipantsChecks(final Exception e) {
+        return new ApiError("CONFLICT",
                 "For the requested operation the conditions are not met.",
                 e.getMessage());
     }
@@ -41,8 +40,8 @@ public class ApplicationExceptionHandler {
             NotApplicableEvent.class
     })
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse catchUniqueConstraint(final NotApplicableEvent e) {
-        return new ErrorResponse("FORBIDDEN",
+    public ApiError catchUniqueConstraint(final NotApplicableEvent e) {
+        return new ApiError("FORBIDDEN",
                 "For the requested operation the conditions are not met.",
                 e.getMessage());
     }
@@ -51,11 +50,12 @@ public class ApplicationExceptionHandler {
 //            MethodArgumentNotValidException.class,
             NumberFormatException.class,
             IncorrectStatusException.class,
+            IncorrectDateException.class,
             EventSortOrderNotValidException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse catchValidation(final Exception e) {
-        return new ErrorResponse("BAD_REQUEST",
+    public ApiError catchValidation(final Exception e) {
+        return new ApiError("BAD_REQUEST",
                 "Incorrectly made request.",
                 e.getMessage());
     }
@@ -70,8 +70,8 @@ public class ApplicationExceptionHandler {
             BookingStatusCanChaneOnlyOwner.class
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse catchNotFound(final RuntimeException e) {
-        return new ErrorResponse(
+    public ApiError catchNotFound(final RuntimeException e) {
+        return new ApiError(
                 "NOT_FOUND",
                 "The required object was not found.",
                 e.getMessage());
