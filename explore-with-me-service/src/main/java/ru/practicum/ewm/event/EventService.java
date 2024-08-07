@@ -57,8 +57,8 @@ public class EventService {
 
     public Collection<EventFullDto> getUserEvents(Long userId, Integer from, Integer size) {
         userRepository.findById(userId).orElseThrow(
-                        () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
-                );
+                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
+        );
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
         return eventRepository.findAllByUserIdOrderById(userId, page).stream().map(
                 //TODO define views and confirms for each
@@ -73,9 +73,10 @@ public class EventService {
                 .build();
         StatisticRestClient.sendData(endpointHit);
 
-        Event eventByUserAndId = eventRepository.findById(eventId).orElseThrow(
-                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
-        );
+        Event eventByUserAndId = eventRepository.findEventByIdAndEventStatus(eventId, EventStatus.PUBLISHED)
+                .orElseThrow(
+                        () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+                );
         List<ViewStats> viewStats = StatisticRestClient.getData(
                 LocalDateTime.of(0, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),
                 LocalDateTime.of(5000, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),
@@ -85,15 +86,25 @@ public class EventService {
         Map<Long, Long> viewsByEvent = viewStats.stream()
                 .filter(viewStatsLine -> viewStatsLine.getApp().equals(EWM_MAIN_SERVICE_NAME))
                 .filter(viewStats1 -> viewStats1.getUri().startsWith("/events/"))
-                .collect(Collectors.toMap(viewStatsLine -> {
-            int lastSlashIndex = viewStatsLine.getUri().lastIndexOf('/');
-                    return Long.valueOf(viewStatsLine.getUri().substring(lastSlashIndex + 1));
-        }, ViewStats::getHits));
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(viewStatsLine -> {
+                            int lastSlashIndex = viewStatsLine.getUri().lastIndexOf('/');
+                            return Long.valueOf(viewStatsLine.getUri().substring(lastSlashIndex + 1));
+                        }, ViewStats::getHits),
+                        resultMap -> resultMap.isEmpty() ? Map.of(0L, 0L) : resultMap)
+                );
 
-        Map<Long, Long> confirmedRequestsByEvent = requestRepository.countRequestByEventId(RequestStatus.CONFIRMED).stream()
-                .collect(Collectors.toMap(RequestsCountByEvent::getEventId, RequestsCountByEvent::getCount));
+        Map<Long, Long> confirmedRequestsByEvent = requestRepository.countRequestByEventId(RequestStatus.CONFIRMED)
+                .stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(RequestsCountByEvent::getEventId, RequestsCountByEvent::getCount),
+                        resultMap -> resultMap.isEmpty() ? Map.of(0L, 0L) : resultMap)
+                );
 
-        return EventMapper.eventToFullDto(eventByUserAndId, viewsByEvent.get(eventId), confirmedRequestsByEvent.get(eventId));
+        return EventMapper.eventToFullDto(eventByUserAndId,
+                viewsByEvent.getOrDefault(eventId, 0L),
+                confirmedRequestsByEvent.getOrDefault(eventId, 0L)
+        );
     }
 
     public EventFullDto getUserEventById(Long userId, Long eventId) {
