@@ -62,7 +62,7 @@ public class RequestService {
                 .requester(requester)
                 .event(event)
                 .build();
-        if (!event.isRequestModeration()) {
+        if (event.isRequestModeration()) {
             request.setStatus(RequestStatus.CONFIRMED);
         }
 
