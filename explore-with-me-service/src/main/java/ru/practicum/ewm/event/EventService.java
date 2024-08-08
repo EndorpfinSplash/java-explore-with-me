@@ -429,10 +429,32 @@ public class EventService {
     }
 
     public EventFullDto patchAdminEventById(Long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
-        Event eventForUpdate = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId)));
+        Event eventForUpdate = eventRepository.findById(eventId).orElseThrow(
+                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+        );
 
-        if (updateEventAdminRequest.getEventDate() != null && updateEventAdminRequest.getEventDate().minusHours(1L).isBefore(LocalDateTime.now())) {
+        if (updateEventAdminRequest.getEventDate() != null &&
+                updateEventAdminRequest.getEventDate().minusHours(1L).isBefore(LocalDateTime.now())
+        ) {
             throw new EventNotValidArgumentException("Event should be announced 1 hours earlier then event");
+        }
+
+        if (eventForUpdate.getEventStatus() == EventStatus.PUBLISHED &&
+                updateEventAdminRequest.getStateAction() == UpdateEventAdminRequest.StateAction.PUBLISH_EVENT
+        ) {
+            throw new NotValidRequestException("Event has already published");
+        }
+
+        if (eventForUpdate.getEventStatus() == EventStatus.CANCELED &&
+                updateEventAdminRequest.getStateAction() == UpdateEventAdminRequest.StateAction.PUBLISH_EVENT
+        ) {
+            throw new NotValidRequestException("Event has already been canceled");
+        }
+
+        if (eventForUpdate.getEventStatus() == EventStatus.PUBLISHED &&
+                updateEventAdminRequest.getStateAction() == UpdateEventAdminRequest.StateAction.REJECT_EVENT
+        ) {
+            throw new NotValidRequestException("Event has already published");
         }
 
         if (eventForUpdate.getEventStatus() == EventStatus.PENDING &&
