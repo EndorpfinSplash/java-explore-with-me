@@ -62,7 +62,7 @@ public class RequestService {
                 .requester(requester)
                 .event(event)
                 .build();
-        if (event.isRequestModeration()) {
+        if (!event.isRequestModeration()) {
             request.setStatus(RequestStatus.CONFIRMED);
         }
 
@@ -89,7 +89,7 @@ public class RequestService {
         if (!Objects.equals(user.getId(), request.getRequester().getId())) {
             throw new NotValidRequestException("You can cancel only your own requests");
         }
-        request.setStatus(RequestStatus.REJECTED);
+        request.setStatus(RequestStatus.CANCELED);
         Request savedRequest = requestRepository.save(request);
         return RequestMapper.requestToParticipationRequestDto(savedRequest);
     }

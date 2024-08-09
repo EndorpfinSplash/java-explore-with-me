@@ -120,9 +120,13 @@ public class EventService {
 
     public EventFullDto patchUserEventById(Long userId, Long eventId, UpdateEventUserRequest updateEventUserRequest) {
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId)));
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
+        );
         //TODO define views and confirms
-        Event eventForUpdate = eventRepository.findEventByUserAndId(user, eventId).orElseThrow(() -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId)));
+        Event eventForUpdate = eventRepository.findEventByUserAndId(user, eventId).orElseThrow(
+                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+        );
         if (!(eventForUpdate.getEventStatus() == EventStatus.PENDING || eventForUpdate.getEventStatus() == EventStatus.CANCELED)) {
             throw new NotApplicableEvent("Only pending or canceled events can be changed");
         }
@@ -230,10 +234,14 @@ public class EventService {
 
     private void setNewStatusesForRequests(EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest, RequestStatus newStatus) {
         eventRequestStatusUpdateRequest.getRequestIds().forEach(requestId -> {
-            Request request = requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFoundException(MessageFormat.format("Request with id={0} was not found", requestId)));
-            if (request.getStatus() != RequestStatus.PENDING) {
-                throw new IncorrectStatusException(MessageFormat.format("Request with id={0} must have status PENDING", requestId));
-            }
+            Request request = requestRepository.findById(requestId).orElseThrow(
+                    () -> new RequestNotFoundException(MessageFormat.format("Request with id={0} was not found", requestId))
+            );
+//            if (request.getStatus() != RequestStatus.PENDING) {
+//                throw new IncorrectStatusException(
+//                        MessageFormat.format("Request with id={0} must have status PENDING", requestId)
+//                );
+//            }
             request.setStatus(newStatus);
             requestRepository.save(request);
         });
@@ -472,7 +480,6 @@ public class EventService {
             EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(() -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found", eventCategoryId)));
             eventForUpdate.setCategory(eventCategory);
         }
-
         if (updateEventAdminRequest.getAnnotation() != null) {
             eventForUpdate.setAnnotation(updateEventAdminRequest.getAnnotation());
         }
@@ -488,6 +495,12 @@ public class EventService {
         if (updateEventAdminRequest.getLocation() != null) {
             eventForUpdate.setLocationLat(updateEventAdminRequest.getLocation().getLat());
             eventForUpdate.setLocationLon(updateEventAdminRequest.getLocation().getLon());
+        }
+        if (updateEventAdminRequest.getParticipantLimit() != null) {
+            eventForUpdate.setParticipantLimit(updateEventAdminRequest.getParticipantLimit());
+        }
+        if (updateEventAdminRequest.getPaid()!=null) {
+            eventForUpdate.setPaid(updateEventAdminRequest.getPaid());
         }
 
         Event savedEvent = eventRepository.save(eventForUpdate);
