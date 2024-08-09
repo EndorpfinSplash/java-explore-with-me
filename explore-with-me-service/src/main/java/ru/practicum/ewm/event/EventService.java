@@ -136,7 +136,9 @@ public class EventService {
             eventForUpdate.setEventStatus(EventStatus.CANCELED);
         }
 
-        if (updateEventUserRequest.getEventDate() != null && updateEventUserRequest.getEventDate().minusHours(2L).isBefore(LocalDateTime.now())) {
+        if (updateEventUserRequest.getEventDate() != null &&
+                updateEventUserRequest.getEventDate().minusHours(2L).isBefore(LocalDateTime.now())
+        ) {
             throw new EventNotValidArgumentException("Event should be announced 2 hours earlier then event");
         }
 
@@ -147,7 +149,9 @@ public class EventService {
 
         Long eventCategoryId = updateEventUserRequest.getCategory();
         if (eventCategoryId != null) {
-            EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(() -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found", eventCategoryId)));
+            EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(
+                    () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found", eventCategoryId))
+            );
             eventForUpdate.setCategory(eventCategory);
         }
 
@@ -196,16 +200,23 @@ public class EventService {
             throw new IncorrectStatusException("Incorrect request status");
         }
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId)));
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
+        );
 
-        Event event = eventRepository.findEventByUserAndId(user, eventId).orElseThrow(() -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId)));
+        Event event = eventRepository.findEventByUserAndId(user, eventId).orElseThrow(
+                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+        );
 
         if (event.getParticipantLimit() == 0 || !event.isRequestModeration()) {
             throw new ParticipantsLimitationException("This event's requests shouldn't be confirmed");
         }
+        EventRequestStatusUpdateResult eventRequestStatusUpdateResult = new EventRequestStatusUpdateResult();
 
+        List<ParticipationRequestDto> participationRequestDtos = setNewStatusesForRequests(eventRequestStatusUpdateRequest, newStatus);
         if (newStatus == RequestStatus.REJECTED) {
-            setNewStatusesForRequests(eventRequestStatusUpdateRequest, newStatus);
+            eventRequestStatusUpdateResult.setRejectedRequests(participationRequestDtos);
+            return eventRequestStatusUpdateResult;
         }
 
         if (newStatus == RequestStatus.CONFIRMED) {
@@ -214,25 +225,16 @@ public class EventService {
             if (confirmedRequestsCnt + requestedConfirmsCnt > event.getParticipantLimit()) {
                 throw new ParticipantsLimitationException("The participant limit has been reached");
             }
-            setNewStatusesForRequests(eventRequestStatusUpdateRequest, newStatus);
+            eventRequestStatusUpdateResult.setConfirmedRequests(participationRequestDtos);
+            return eventRequestStatusUpdateResult;
         }
-
-        EventRequestStatusUpdateResult eventRequestStatusUpdateResult = new EventRequestStatusUpdateResult();
-        eventRequestStatusUpdateResult.setConfirmedRequests(
-                requestRepository.getAllByStatusOrderById(RequestStatus.CONFIRMED).stream()
-                        .map(RequestMapper::requestToParticipationRequestDto)
-                        .collect(Collectors.toList())
-        );
-        eventRequestStatusUpdateResult.setRejectedRequests(
-                requestRepository.getAllByStatusOrderById(RequestStatus.REJECTED).stream()
-                        .map(RequestMapper::requestToParticipationRequestDto)
-                        .collect(Collectors.toList())
-        );
 
         return eventRequestStatusUpdateResult;
     }
 
-    private void setNewStatusesForRequests(EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest, RequestStatus newStatus) {
+    private List<ParticipationRequestDto> setNewStatusesForRequests(EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest,
+                                                                    RequestStatus newStatus) {
+        List<ParticipationRequestDto> result = new ArrayList<>();
         eventRequestStatusUpdateRequest.getRequestIds().forEach(requestId -> {
             Request request = requestRepository.findById(requestId).orElseThrow(
                     () -> new RequestNotFoundException(MessageFormat.format("Request with id={0} was not found", requestId))
@@ -244,7 +246,9 @@ public class EventService {
 //            }
             request.setStatus(newStatus);
             requestRepository.save(request);
+            result.add(RequestMapper.requestToParticipationRequestDto(request));
         });
+        return result;
     }
 
     public List<EventShortDto> getPublicEvents(HttpServletRequest httpServletRequest,
@@ -499,7 +503,7 @@ public class EventService {
         if (updateEventAdminRequest.getParticipantLimit() != null) {
             eventForUpdate.setParticipantLimit(updateEventAdminRequest.getParticipantLimit());
         }
-        if (updateEventAdminRequest.getPaid()!=null) {
+        if (updateEventAdminRequest.getPaid() != null) {
             eventForUpdate.setPaid(updateEventAdminRequest.getPaid());
         }
 

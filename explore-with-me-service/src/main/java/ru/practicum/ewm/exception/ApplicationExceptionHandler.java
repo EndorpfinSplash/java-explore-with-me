@@ -27,7 +27,9 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler({
-            ParticipantsLimitationException.class
+            ParticipantsLimitationException.class,
+            NotApplicableEvent.class,
+
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError catchParticipantsChecks(final Exception e) {
@@ -36,15 +38,15 @@ public class ApplicationExceptionHandler {
                 e.getMessage());
     }
 
-    @ExceptionHandler({
-            NotApplicableEvent.class
-    })
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ApiError catchUniqueConstraint(final NotApplicableEvent e) {
-        return new ApiError("FORBIDDEN",
-                "For the requested operation the conditions are not met.",
-                e.getMessage());
-    }
+//    @ExceptionHandler({
+//            NotApplicableEvent.class
+//    })
+//    @ResponseStatus(HttpStatus.FORBIDDEN)
+//    public ApiError catchUniqueConstraint(final NotApplicableEvent e) {
+//        return new ApiError("FORBIDDEN",
+//                "For the requested operation the conditions are not met.",
+//                e.getMessage());
+//    }
 
     @ExceptionHandler({
 //            MethodArgumentNotValidException.class,
