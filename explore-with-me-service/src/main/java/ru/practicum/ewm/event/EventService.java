@@ -213,8 +213,9 @@ public class EventService {
         }
         EventRequestStatusUpdateResult eventRequestStatusUpdateResult = new EventRequestStatusUpdateResult();
 
-        List<ParticipationRequestDto> participationRequestDtos = setNewStatusesForRequests(eventRequestStatusUpdateRequest, newStatus);
+        final List<ParticipationRequestDto> participationRequestDtos;
         if (newStatus == RequestStatus.REJECTED) {
+            participationRequestDtos = setNewStatusesForRequests(eventRequestStatusUpdateRequest, newStatus);
             eventRequestStatusUpdateResult.setRejectedRequests(participationRequestDtos);
             return eventRequestStatusUpdateResult;
         }
@@ -225,6 +226,7 @@ public class EventService {
             if (confirmedRequestsCnt + requestedConfirmsCnt > event.getParticipantLimit()) {
                 throw new ParticipantsLimitationException("The participant limit has been reached");
             }
+            participationRequestDtos = setNewStatusesForRequests(eventRequestStatusUpdateRequest, newStatus);
             eventRequestStatusUpdateResult.setConfirmedRequests(participationRequestDtos);
             return eventRequestStatusUpdateResult;
         }
@@ -239,11 +241,11 @@ public class EventService {
             Request request = requestRepository.findById(requestId).orElseThrow(
                     () -> new RequestNotFoundException(MessageFormat.format("Request with id={0} was not found", requestId))
             );
-//            if (request.getStatus() != RequestStatus.PENDING) {
-//                throw new IncorrectStatusException(
-//                        MessageFormat.format("Request with id={0} must have status PENDING", requestId)
-//                );
-//            }
+            if (request.getStatus() != RequestStatus.PENDING) {
+                throw new IncorrectStatusException(
+                        MessageFormat.format("Request with id={0} must have status PENDING", requestId)
+                );
+            }
             request.setStatus(newStatus);
             requestRepository.save(request);
             result.add(RequestMapper.requestToParticipationRequestDto(request));

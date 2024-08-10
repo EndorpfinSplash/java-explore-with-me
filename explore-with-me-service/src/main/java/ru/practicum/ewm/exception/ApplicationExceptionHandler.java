@@ -29,6 +29,7 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler({
             ParticipantsLimitationException.class,
             NotApplicableEvent.class,
+            IncorrectStatusException.class
 
     })
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -51,7 +52,7 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler({
 //            MethodArgumentNotValidException.class,
             NumberFormatException.class,
-            IncorrectStatusException.class,
+//            IncorrectStatusException.class,
             IncorrectDateException.class,
             EventSortOrderNotValidException.class
     })

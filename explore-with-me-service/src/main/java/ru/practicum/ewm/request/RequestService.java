@@ -54,7 +54,7 @@ public class RequestService {
         }
 
         int participantsCnt = requestRepository.countRequestByEventAndStatus(event, RequestStatus.CONFIRMED);
-        if (participantsCnt >= event.getParticipantLimit()) {
+        if (participantsCnt >= event.getParticipantLimit() && event.getParticipantLimit() > 0) {
             throw new ParticipantsLimitationException("The participant limit has been reached");
         }
 
@@ -62,7 +62,7 @@ public class RequestService {
                 .requester(requester)
                 .event(event)
                 .build();
-        if (!event.isRequestModeration()) {
+        if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
         }
 
