@@ -81,7 +81,7 @@ public class EventService {
                 LocalDateTime.of(0, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),
                 LocalDateTime.of(5000, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),
                 null,
-                null);
+                String.valueOf(true));
 
         Map<Long, Long> viewsByEvent = viewStats.stream()
                 .filter(viewStatsLine -> viewStatsLine.getApp().equals(EWM_MAIN_SERVICE_NAME))
@@ -315,15 +315,11 @@ public class EventService {
         query.where(predicates.toArray(new Predicate[0]));
 
         List<Event> eventsList = entityManager.createQuery(query)
-//                .setFirstResult((int) page.getOffset())
-//                .setMaxResults(page.getPageSize())
                 .getResultList();
 
         Map<Long, Long> confirmedRequestsByEvent = requestRepository.countRequestByEventId(RequestStatus.CONFIRMED).stream()
                 .collect(Collectors.toMap(RequestsCountByEvent::getEventId, RequestsCountByEvent::getCount));
 
-//        String startDate = LocalDateTime.of(0, 1, 1, 0, 0).format(DATE_TIME_FORMATTER);
-//        String endDate = LocalDateTime.now().format(DATE_TIME_FORMATTER);
         List<ViewStats> viewStats = StatisticRestClient.getData(
                 LocalDateTime.of(0, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),
                 LocalDateTime.of(5000, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),

@@ -27,10 +27,9 @@ public class EventControllerAdmin {
             @RequestParam(value = "categories", required = false) final List<Integer> categories,
             @RequestParam(value = "rangeStart", required = false) final String rangeStart,
             @RequestParam(value = "rangeEnd", required = false) final String rangeEnd,
-
             @RequestParam(value = "from", defaultValue = "0") final Integer from,
             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
-
+        log.info("GET request to fetch list of events received.");
         return eventService.getAdminEvents(
                 Optional.ofNullable(users),
                 Optional.ofNullable(states),
