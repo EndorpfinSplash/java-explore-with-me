@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.user.User;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Data

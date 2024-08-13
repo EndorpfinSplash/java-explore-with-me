@@ -15,7 +15,7 @@ import ru.practicum.ewm.request.RequestRepository;
 import ru.practicum.ewm.request.RequestStatus;
 import ru.practicum.ewm.request.RequestsCountByEvent;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;

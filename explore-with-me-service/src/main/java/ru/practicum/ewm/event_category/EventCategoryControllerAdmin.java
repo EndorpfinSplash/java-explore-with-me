@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event_category.dto.CategoryDto;
 import ru.practicum.ewm.event_category.dto.NewCategoryDto;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/admin/categories")

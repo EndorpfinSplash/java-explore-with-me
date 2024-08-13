@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.ewm.event_category.Location;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 
 @Data

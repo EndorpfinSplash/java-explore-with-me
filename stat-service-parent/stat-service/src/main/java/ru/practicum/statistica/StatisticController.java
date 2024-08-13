@@ -13,7 +13,7 @@ import ru.practicum.commons.EndpointHit;
 import ru.practicum.commons.EventOutDto;
 import ru.practicum.commons.ViewStats;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
