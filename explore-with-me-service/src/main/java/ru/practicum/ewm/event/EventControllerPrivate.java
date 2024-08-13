@@ -8,6 +8,7 @@ import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 
 @RestController
@@ -64,6 +65,16 @@ public class EventControllerPrivate {
     public EventRequestStatusUpdateResult patchEventByIds(@PathVariable("userId") final Long userId,
                                                           @PathVariable("eventId") final Long eventId,
                                                           @RequestBody @Valid final EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest
+    ) {
+        log.info("Patch request from userId={} to update requests for eventId={} received.", userId, eventId);
+        return eventService.patchRequests(userId, eventId, eventRequestStatusUpdateRequest);
+    }
+
+    //TODO temporary hotfix
+    @PatchMapping("/{eventId}/requests/")
+    public EventRequestStatusUpdateResult patchEventByIdsHotfix(@PathVariable("userId") final Long userId,
+                                                                @PathVariable("eventId") final Long eventId,
+                                                                @RequestBody @Valid final EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest
     ) {
         log.info("Patch request from userId={} to update requests for eventId={} received.", userId, eventId);
         return eventService.patchRequests(userId, eventId, eventRequestStatusUpdateRequest);

@@ -280,7 +280,7 @@ public class EventService {
         predicates.add(statusPublished);
 
         categories.ifPresent(categoriesList -> {
-            Predicate inCategoryPredicate = event.get("category").in(categoriesList);
+            Predicate inCategoryPredicate = (event.get("category").get("id")).in(categoriesList);
             predicates.add(inCategoryPredicate);
         });
 
@@ -326,23 +326,26 @@ public class EventService {
                 null,
                 null);
 
-        Map<Long, Long> viewsByEvent = viewStats.stream().filter(viewStatsLine -> viewStatsLine.getApp().equals(EWM_MAIN_SERVICE_NAME)).filter(viewStats1 -> viewStats1.getUri().startsWith("/events/")).collect(Collectors.toMap(viewStatsLine -> {
-            int lastSlashIndex = viewStatsLine.getUri().lastIndexOf('/');
-            Long eventId = Long.valueOf(viewStatsLine.getUri().substring(lastSlashIndex + 1));
-            return eventId;
-        }, ViewStats::getHits));
+        Map<Long, Long> viewsByEvent = viewStats.stream()
+                .filter(viewStatsLine -> viewStatsLine.getApp().equals(EWM_MAIN_SERVICE_NAME))
+                .filter(viewStats1 -> viewStats1.getUri().startsWith("/events/"))
+                .collect(Collectors.toMap(viewStatsLine -> {
+                    int lastSlashIndex = viewStatsLine.getUri().lastIndexOf('/');
+                    Long eventId = Long.valueOf(viewStatsLine.getUri().substring(lastSlashIndex + 1));
+                    return eventId;
+                }, ViewStats::getHits));
 
-        List<EventShortDto> eventShortDtoList = eventsList.stream().filter(currentEvent -> {
-                    if (onlyAvailable && currentEvent.getParticipantLimit() - confirmedRequestsByEvent.get(currentEvent.getId()) > 0) {
+        List<EventShortDto> eventShortDtoList = eventsList.stream()
+                .filter(currentEvent -> {
+                    if (onlyAvailable && currentEvent.getParticipantLimit() -
+                            confirmedRequestsByEvent.getOrDefault(currentEvent.getId(), 0L) > 0) {
                         return true;
                     }
                     return true;
                 })
                 .map(eventEntity -> EventMapper.eventToShortDto(eventEntity,
-                                viewsByEvent.get(eventEntity.getId()) == null ?
-                                        0 : viewsByEvent.get(eventEntity.getId()),
-                                confirmedRequestsByEvent.get(eventEntity.getId()) == null ?
-                                        0 : confirmedRequestsByEvent.get(eventEntity.getId())
+                                viewsByEvent.getOrDefault(eventEntity.getId(),0L),
+                                confirmedRequestsByEvent.getOrDefault(eventEntity.getId(),0L)
                         )
                 )
                 .collect(Collectors.toList());
@@ -375,7 +378,7 @@ public class EventService {
         List<Predicate> predicates = new ArrayList<>();
 
         users.ifPresent(usersIds -> {
-            Predicate inCategoryPredicate = event.get("user").in(usersIds);
+            Predicate inCategoryPredicate = (event.get("user").get("id")).in(usersIds);
             predicates.add(inCategoryPredicate);
         });
 
@@ -389,7 +392,7 @@ public class EventService {
         );
 
         categories.ifPresent(categoriesList -> {
-            Predicate inCategoryPredicate = event.get("category").in(categoriesList);
+            Predicate inCategoryPredicate = (event.get("category").get("id")).in(categoriesList);
             predicates.add(inCategoryPredicate);
         });
 
