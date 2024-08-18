@@ -67,7 +67,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.3.0.RELEASE</version> <!-- Используйте подходящую версию -->
+                <version>3.3.0</version> <!-- Используйте подходящую версию -->
                 <executions>
                     <execution>
                         <goals>
