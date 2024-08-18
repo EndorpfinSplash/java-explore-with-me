@@ -1,6 +1,7 @@
 package ru.practicum.ewm.compilation;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,6 @@ import ru.practicum.ewm.request.RequestRepository;
 import ru.practicum.ewm.request.RequestStatus;
 import ru.practicum.ewm.request.RequestsCountByEvent;
 
-import jakarta.validation.Valid;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
@@ -106,8 +106,8 @@ public class CompilationService {
 
         Map<Long, Long> confirmedRequestsByEvent = requestRepository.countRequestByEventId(RequestStatus.CONFIRMED).stream()
                 .collect(Collectors.toMap(RequestsCountByEvent::getEventId, RequestsCountByEvent::getCount));
-        return compilations.stream().
-                map(compilation -> CompilationMapper.compilationToCompilationDto(compilation, confirmedRequestsByEvent))
+        return compilations.stream()
+                .map(compilation -> CompilationMapper.compilationToCompilationDto(compilation, confirmedRequestsByEvent))
                 .collect(Collectors.toList());
     }
 }

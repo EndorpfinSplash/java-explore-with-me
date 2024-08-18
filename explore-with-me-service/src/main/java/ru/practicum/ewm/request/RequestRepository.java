@@ -20,12 +20,10 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     Collection<Request> findRequestByEventId(Long eventId);
 
-    List<Request> getAllByStatusOrderById(RequestStatus status);
-
     @Query("select new ru.practicum.ewm.request.RequestsCountByEvent(r.event.id, count(r.requester))" +
-            "from Request as r "+
-            "where r.status = ?1 "+
-            "group by r.event.id "+
+            "from Request as r " +
+            "where r.status = ?1 " +
+            "group by r.event.id " +
             "order by count(r.requester) ")
     List<RequestsCountByEvent> countRequestByEventId(RequestStatus requestStatus);
 }

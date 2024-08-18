@@ -1,9 +1,8 @@
 package ru.practicum.ewm.event;
 
+import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.Location;
 import ru.practicum.ewm.event_category.dto.CategoryDto;
