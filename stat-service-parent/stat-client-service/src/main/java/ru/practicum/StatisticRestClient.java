@@ -5,7 +5,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -14,10 +13,7 @@ import ru.practicum.commons.EventOutDto;
 import ru.practicum.commons.ViewStats;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -27,7 +23,7 @@ public class StatisticRestClient {
     private static final String RESOURCE_PATH_TO_GET_STATISTIC = "/stats";
 
 
-    private static int port = 9090;
+    private static final int port = 9090;
 //    @Value("${server.port}")
 //    public void setPort(int port) {
 //        StatisticRestClient.port = port;
@@ -37,7 +33,7 @@ public class StatisticRestClient {
 //        return port;
 //    }
 
-    private static String host = "localhost";
+    private static final String host = "localhost";
 //    @Value("${host}")
 //    public void setHost(String host) {
 //        StatisticRestClient.host = host;
