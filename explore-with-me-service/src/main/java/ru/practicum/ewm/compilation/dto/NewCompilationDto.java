@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewCompilationDto {
+    @Builder.Default
     private List<Long> events = new ArrayList<>();
     private Boolean pinned;
     @Length(min = 1, max = 50)
