@@ -33,6 +33,10 @@ public class StatisticService {
         LocalDateTime end = LocalDateTime.parse(URLDecoder.decode(endStr, StandardCharsets.UTF_8),
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("Start date must be before end date");
+        }
+
         if ((uris == null || uris.isEmpty()) && !unique) {
             return statisticRepository.countEvents(start, end);
         }
