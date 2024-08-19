@@ -2,6 +2,7 @@ package ru.practicum.statistica;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,17 +38,13 @@ public class StatisticController {
 
     @GetMapping("/stats")
     public List<ViewStats> getStats(
-
             @RequestParam(value = "start")
-//            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             String  start,
-
             @RequestParam(value = "end")
-//            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             String end,
             @RequestParam(value = "uris", required = false) List<String> uris,
             @RequestParam(value = "unique", required = false, defaultValue = "false") boolean unique
-    ) {
+    ) throws BadRequestException {
         log.info("Get events from {} to end {} for list of URIs[{}] with unique flag {}",
                 start, end, Collections.singletonList(uris), unique);
         List<ViewStats> eventStatistic = statisticService.getEventStatistic(start, end, uris, unique);
