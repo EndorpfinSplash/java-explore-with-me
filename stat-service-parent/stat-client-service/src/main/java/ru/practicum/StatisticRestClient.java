@@ -1,6 +1,7 @@
 package ru.practicum;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,27 +22,18 @@ public class StatisticRestClient {
 
     private static final String RESOURCE_PATH_TO_SAVE_EVENT = "/hit";
     private static final String RESOURCE_PATH_TO_GET_STATISTIC = "/stats";
+    private static String host;
+    private static int port;
 
+    @Value("${server.port}")
+    public void setPort(int port) {
+        StatisticRestClient.port = port;
+    }
 
-    private static final int port = 9090;
-//    @Value("${server.port}")
-//    public void setPort(int port) {
-//        StatisticRestClient.port = port;
-//    }
-//
-//    public static int getPort() {
-//        return port;
-//    }
-
-    private static final String host = "localhost";
-//    @Value("${host}")
-//    public void setHost(String host) {
-//        StatisticRestClient.host = host;
-//    }
-//
-//    public static String getHost() {
-//        return host;
-//    }
+    @Value("${host}")
+    public void setHost(String host) {
+        StatisticRestClient.host = host;
+    }
 
     private static final RestTemplate restTemplate = new RestTemplate();
 
