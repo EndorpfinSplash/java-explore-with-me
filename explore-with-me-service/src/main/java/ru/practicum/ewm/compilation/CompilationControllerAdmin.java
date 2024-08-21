@@ -22,7 +22,9 @@ public class CompilationControllerAdmin {
     @ResponseStatus(HttpStatus.CREATED)
     public CompilationDto createCompilation(@RequestBody @Valid NewCompilationDto newCompilationDto) {
         log.info("POST request {} to create compilations received.", newCompilationDto);
-        return compilationService.createCompilation(newCompilationDto);
+        CompilationDto compilation = compilationService.createCompilation(newCompilationDto);
+        log.info("Compilation {} was created.", compilation);
+        return compilation;
     }
 
     @DeleteMapping("/{compId}")
@@ -36,6 +38,8 @@ public class CompilationControllerAdmin {
     public CompilationDto updateCompilation(@PathVariable Long compId,
                                   @RequestBody @Valid UpdateCompilationRequest updateCompilationRequest) {
         log.info("UPDATE request for compilation_id = {} received.", compId);
-        return compilationService.update(compId, updateCompilationRequest);
+        CompilationDto updatedCompilation = compilationService.update(compId, updateCompilationRequest);
+        log.info("Compilation {} was successfully updated.", updatedCompilation);
+        return updatedCompilation;
     }
 }

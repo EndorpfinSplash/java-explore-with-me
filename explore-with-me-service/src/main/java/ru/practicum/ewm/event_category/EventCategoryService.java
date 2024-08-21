@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event_category.dto.CategoryDto;
 import ru.practicum.ewm.event_category.dto.NewCategoryDto;
-import ru.practicum.ewm.exception.EventCategoryNotFoundException;
+import ru.practicum.ewm.exception.EntityNotFoundException;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -31,31 +31,15 @@ public class EventCategoryService {
     }
 
     public CategoryDto updateEventCategory(Integer eventCategoryId, NewCategoryDto eventCategoryUpdateDto) {
-        EventCategory eventCategoryForUpdate = eventCategoryRepository.findById(Long.valueOf(eventCategoryId)).orElseThrow(
-                () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found",
-                        eventCategoryId)
-                )
-        );
+        EventCategory eventCategoryForUpdate = findEventCategory(Long.valueOf(eventCategoryId));
         eventCategoryForUpdate.setName(eventCategoryUpdateDto.getName());
         EventCategory updatedEventCategory = eventCategoryRepository.save(eventCategoryForUpdate);
         return EventCategoryMapper.eventCategoryToEventCategoryOutDto(updatedEventCategory);
     }
 
-    public CategoryDto getEventCategoryIdById(Long eventCategoryId) {
-        EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId)
-                .orElseThrow(
-                        () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found",
-                                eventCategoryId))
-                );
-        return EventCategoryMapper.eventCategoryToEventCategoryOutDto(eventCategory);
-    }
-
     public void deleteEventCategoryById(Integer id) {
         Long eventCategoryId = Long.valueOf(id);
-        eventCategoryRepository.findById(eventCategoryId).orElseThrow(
-                () -> new EventCategoryNotFoundException(
-                        MessageFormat.format("Category with id={0} was not found", eventCategoryId))
-        );
+        findEventCategory(eventCategoryId);
         eventCategoryRepository.deleteById(eventCategoryId);
     }
 
@@ -67,13 +51,16 @@ public class EventCategoryService {
     }
 
     public CategoryDto findById(Integer eventCategoryId) {
-        return eventCategoryRepository.findById(Long.valueOf(eventCategoryId))
-                .map(EventCategoryMapper::eventCategoryToEventCategoryOutDto)
+        return EventCategoryMapper.eventCategoryToEventCategoryOutDto(
+                findEventCategory(Long.valueOf(eventCategoryId))
+        );
+    }
+
+    public EventCategory findEventCategory(Long eventCategoryId) {
+        return eventCategoryRepository.findById(eventCategoryId)
                 .orElseThrow(
-                        () -> new EventCategoryNotFoundException(
-                                MessageFormat.format("Category with id={0} was not found",
-                                        eventCategoryId)
-                        )
+                        () -> new EntityNotFoundException(MessageFormat.format("Category with id={0} was not found",
+                                eventCategoryId))
                 );
     }
 }

@@ -22,7 +22,9 @@ public class EventCategoryControllerPublic {
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
         log.info("GET request to fetch event_categories from={} with size={} received.", from,size);
-        return eventCategoryService.getEventCategories(from, size);
+        Collection<CategoryDto> eventCategories = eventCategoryService.getEventCategories(from, size);
+        log.info("{} events were fetched.", eventCategories.size());
+        return eventCategories;
     }
 
     @GetMapping("/{id}")
@@ -30,7 +32,9 @@ public class EventCategoryControllerPublic {
             @PathVariable("id") Integer id
     ) {
         log.info("GET request to fetch event_category_id={} received.", id);
-        return eventCategoryService.findById(id);
+        CategoryDto categoryById = eventCategoryService.findById(id);
+        log.info("{} event_category was found.", categoryById);
+        return categoryById;
     }
 
 }

@@ -21,20 +21,26 @@ public class RequestControllerPrivate {
     public ParticipationRequestDto createRequest(@PathVariable("userId") final Long userId,
                                                  @RequestParam("eventId") final Long eventId) {
         log.info("Create request from user {} for event_id={}", userId, eventId);
-        return requestService.createRequest(userId, eventId);
+        ParticipationRequestDto request = requestService.createRequest(userId, eventId);
+        log.info("Request created {}", request);
+        return request;
     }
 
     @GetMapping
     public Collection<ParticipationRequestDto> getAllUserRequests(@PathVariable("userId") final Long userId) {
         log.info("Get all request for user {} ", userId);
-        return requestService.getAllRequest(userId);
+        Collection<ParticipationRequestDto> allRequest = requestService.getAllRequest(userId);
+        log.info("All request for user id= {} is: {} ",userId, allRequest);
+        return allRequest;
     }
 
     @PatchMapping("/{requestId}/cancel")
     public ParticipationRequestDto cancelRequest(@PathVariable("userId") final Long userId,
                                                  @PathVariable("requestId") final Long requestId) {
         log.info("Cancel request_id={} for user {} ", requestId, userId);
-        return requestService.cancelRequest(userId, requestId);
+        ParticipationRequestDto participationRequestDto = requestService.cancelRequest(userId, requestId);
+        log.info("Request {} was canceled for user_id = {}", participationRequestDto, userId);
+        return participationRequestDto;
     }
 
 }

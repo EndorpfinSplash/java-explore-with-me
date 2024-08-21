@@ -11,7 +11,7 @@ import ru.practicum.ewm.compilation.dto.NewCompilationDto;
 import ru.practicum.ewm.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventRepository;
-import ru.practicum.ewm.exception.EventNotFoundException;
+import ru.practicum.ewm.exception.EntityNotFoundException;
 import ru.practicum.ewm.request.RequestRepository;
 import ru.practicum.ewm.request.RequestStatus;
 import ru.practicum.ewm.request.RequestsCountByEvent;
@@ -33,7 +33,7 @@ public class CompilationService {
     public CompilationDto createCompilation(final @Valid NewCompilationDto newCompilationDto) {
         Set<Event> eventList = newCompilationDto.getEvents().stream()
                 .map(eventId -> eventRepository.findById(eventId).orElseThrow(
-                                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+                                () -> new EntityNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
                         )
                 )
                 .collect(Collectors.toSet());
@@ -51,23 +51,17 @@ public class CompilationService {
     }
 
     public void delete(Long compId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(
-                () -> new EventNotFoundException(MessageFormat.format("Compilation with id={0} was not found", compId)
-                )
-        );
+        Compilation compilation = findCompilation(compId);
         compilationRepository.delete(compilation);
     }
 
     public CompilationDto update(Long compId, UpdateCompilationRequest updateCompilationRequest) {
-        Compilation compilationForUpdate = compilationRepository.findById(compId).orElseThrow(
-                () -> new EventNotFoundException(MessageFormat.format("Compilation with id={0} was not found", compId)
-                )
-        );
+        Compilation compilationForUpdate = findCompilation(compId);
         if (updateCompilationRequest.getEvents() != null) {
             Set<Event> eventSet = updateCompilationRequest.getEvents().stream()
                     .map(eventId -> eventRepository.findById(eventId).orElseThrow(
-                                    () -> new EventNotFoundException(
-                                            MessageFormat.format("Compilation with id={0} was not found", eventId)
+                                    () -> new EntityNotFoundException(
+                                            MessageFormat.format("Event with id={0} was not found", eventId)
                                     )
                             )
                     )
@@ -89,10 +83,7 @@ public class CompilationService {
     }
 
     public CompilationDto getCompilation(Long compId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(
-                () -> new EventNotFoundException(MessageFormat.format("Compilation with id={0} was not found", compId)
-                )
-        );
+        Compilation compilation = findCompilation(compId);
         Map<Long, Long> confirmedRequestsByEvent = requestRepository.countRequestByEventId(RequestStatus.CONFIRMED).stream()
                 .collect(Collectors.toMap(RequestsCountByEvent::getEventId, RequestsCountByEvent::getCount));
         return CompilationMapper.compilationToCompilationDto(compilation, confirmedRequestsByEvent);
@@ -110,4 +101,12 @@ public class CompilationService {
                 .map(compilation -> CompilationMapper.compilationToCompilationDto(compilation, confirmedRequestsByEvent))
                 .collect(Collectors.toList());
     }
+
+    private Compilation findCompilation(Long compId) {
+        return compilationRepository.findById(compId).orElseThrow(
+                () -> new EntityNotFoundException(MessageFormat.format("Compilation with id={0} was not found", compId)
+                )
+        );
+    }
+
 }

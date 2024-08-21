@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.EventStatus;
-import ru.practicum.ewm.exception.*;
+import ru.practicum.ewm.exception.EntityNotFoundException;
+import ru.practicum.ewm.exception.NotValidRequestException;
+import ru.practicum.ewm.exception.ParticipantsLimitationException;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.user.User;
-import ru.practicum.ewm.user.UserRepository;
+import ru.practicum.ewm.user.UserService;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -21,19 +23,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RequestService {
     private final RequestRepository requestRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final EventRepository eventRepository;
 
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
-        User requester = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(MessageFormat.format("Requester with userId={0} not found", userId))
-        );
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(
-                        () -> new EventNotFoundException(
-                                MessageFormat.format("Event with id={0} was not found", eventId)
-                        )
-                );
+        User requester = userService.findUser(userId);
+        Event event = findEvent(eventId);
 
         if (event.getEventStatus() != EventStatus.PUBLISHED) {
             throw new NotValidRequestException(
@@ -78,14 +73,8 @@ public class RequestService {
     }
 
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} was not found", userId))
-        );
-        Request request = requestRepository.findById(requestId).orElseThrow(
-                () -> new RequestNotFoundException(
-                        MessageFormat.format("Request with id={0} was not found", requestId)
-                )
-        );
+        User user = userService.findUser(userId);
+        Request request = findRequest(requestId);
         if (!Objects.equals(user.getId(), request.getRequester().getId())) {
             throw new NotValidRequestException("You can cancel only your own requests");
         }
@@ -93,4 +82,22 @@ public class RequestService {
         Request savedRequest = requestRepository.save(request);
         return RequestMapper.requestToParticipationRequestDto(savedRequest);
     }
+
+    private Request findRequest(Long requestId) {
+        return requestRepository.findById(requestId).orElseThrow(
+                () -> new EntityNotFoundException(
+                        MessageFormat.format("Request with id={0} was not found", requestId)
+                )
+        );
+    }
+
+    private Event findEvent(Long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException(
+                                MessageFormat.format("Event with id={0} was not found", eventId)
+                        )
+                );
+    }
+
 }

@@ -23,7 +23,9 @@ public class UserController {
     @GetMapping("/all")
     public Collection<UserDto> getAllUsers() {
         log.info("GET request to fetch collection of all users received.");
-        return userService.getAllUsers();
+        Collection<UserDto> allUsers = userService.getAllUsers();
+        log.info("{} users found.", allUsers.size());
+        return allUsers;
     }
 
     @GetMapping
@@ -33,13 +35,18 @@ public class UserController {
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
         log.info("GET request to fetch collection of users {} from = {} with size = {} received.", ids, from, size);
-        return userService.getUsers(ids,  from,  size);
+        Collection<UserDto> users = userService.getUsers(ids, from, size);
+        log.info("{} users found", users.size());
+        return users;
+
     }
 
     @GetMapping("/{id}")
     public UserDto getUser(@PathVariable("id") Long id) {
         log.info("GET request to fetch user_id={} received.", id);
-        return userService.getUserById(id);
+        UserDto userById = userService.getUserById(id);
+        log.info("{} user found.", userById);
+        return userById;
     }
 
 
@@ -47,13 +54,17 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@RequestBody @Valid final NewUserRequest newUserRequest) {
         log.info("POST request to create {} received.", newUserRequest);
-        return userService.createUser(newUserRequest);
+        UserDto user = userService.createUser(newUserRequest);
+        log.info("{} user created.", user);
+        return user;
     }
 
     @PatchMapping("/{id}")
     public UserDto updateUser(@PathVariable("id") Long id, @RequestBody final UserUpdateDto userUpdateDto) {
         log.info("PATCH request to update user_id={} received.", id);
-        return userService.updateUser(id, userUpdateDto);
+        UserDto userDto = userService.updateUser(id, userUpdateDto);
+        log.info("{} user updated.", userDto);
+        return userDto;
     }
 
     @DeleteMapping("/{id}")

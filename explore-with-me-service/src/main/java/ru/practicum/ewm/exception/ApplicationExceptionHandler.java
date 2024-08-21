@@ -17,7 +17,6 @@ public class ApplicationExceptionHandler {
             EventNotValidArgumentException.class,
             DataIntegrityViolationException.class,
             NotValidRequestException.class,
-//            ParticipantsLimitationException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError catchUniqueConstraint(final Exception e) {
@@ -39,20 +38,8 @@ public class ApplicationExceptionHandler {
                 e.getMessage());
     }
 
-//    @ExceptionHandler({
-//            NotApplicableEvent.class
-//    })
-//    @ResponseStatus(HttpStatus.FORBIDDEN)
-//    public ApiError catchUniqueConstraint(final NotApplicableEvent e) {
-//        return new ApiError("FORBIDDEN",
-//                "For the requested operation the conditions are not met.",
-//                e.getMessage());
-//    }
-
     @ExceptionHandler({
-//            MethodArgumentNotValidException.class,
             NumberFormatException.class,
-//            IncorrectStatusException.class,
             IncorrectDateException.class,
             EventSortOrderNotValidException.class
     })
@@ -64,13 +51,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler({
-            UserNotFoundException.class,
-            ItemNotFoundException.class,
-            EventCategoryNotFoundException.class,
-            EventNotFoundException.class,
-            RequestNotFoundException.class,
-            BookingAccessDeniedException.class,
-            BookingStatusCanChaneOnlyOwner.class
+            EntityNotFoundException.class
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError catchNotFound(final RuntimeException e) {
@@ -79,61 +60,4 @@ public class ApplicationExceptionHandler {
                 "The required object was not found.",
                 e.getMessage());
     }
-
-
-  /*  @ExceptionHandler({
-            CommentForbidden.class,
-    })
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse catchValidation(final CommentForbidden e) {
-        return new ErrorResponse("Item cannot be commented", e.getMessage());
-    }
-
-    @ExceptionHandler({
-            ValidationException.class,
-    })
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse catchValidation(final ValidationException e) {
-        return new ErrorResponse("Parameter validation exception", e.getMessage());
-    }
-
-    @ExceptionHandler({
-            UnknownBookingState.class,
-            BookingCouldntBeModified.class,
-    })
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse catchValidation(final RuntimeException e) {
-        return new ErrorResponse("Unknown state: " + e.getMessage(),
-                "Incorrect booking state was send.");
-    }
-
-    @ExceptionHandler({
-            UserNotFoundException.class,
-            ItemNotFoundException.class,
-            BookingNotFoundException.class,
-            ItemRequestNotFoundException.class,
-            BookingAccessDeniedException.class,
-            BookingStatusCanChaneOnlyOwner.class
-    })
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse catchNotFound(final RuntimeException e) {
-        return new ErrorResponse("Not found exception", e.getMessage());
-    }
-
-    @ExceptionHandler({
-            ItemCouldntBeModified.class,
-    })
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse catchCouldNotModifiedItem(final RuntimeException e) {
-        return new ErrorResponse("You can not modify this item", e.getMessage());
-    }
-
-    @ExceptionHandler({
-            NonUniqueEmail.class
-    })
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse catchNonUniqueEmailCreating(final RuntimeException e) {
-        return new ErrorResponse("User with such email already exist", e.getMessage());
-    }
-*/
 }

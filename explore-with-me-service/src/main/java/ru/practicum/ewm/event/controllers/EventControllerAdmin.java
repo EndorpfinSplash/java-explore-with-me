@@ -1,8 +1,9 @@
-package ru.practicum.ewm.event;
+package ru.practicum.ewm.event.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.event.EventService;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
 
@@ -30,7 +31,7 @@ public class EventControllerAdmin {
             @RequestParam(value = "from", defaultValue = "0") final Integer from,
             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
         log.info("GET request to fetch list of events received.");
-        return eventService.getAdminEvents(
+        Collection<EventFullDto> adminEvents = eventService.getAdminEvents(
                 Optional.ofNullable(users),
                 Optional.ofNullable(states),
                 Optional.ofNullable(categories),
@@ -39,6 +40,8 @@ public class EventControllerAdmin {
                 from,
                 size
         );
+        log.info("{} events were fetched.", adminEvents.size());
+        return adminEvents;
     }
 
 
@@ -48,7 +51,9 @@ public class EventControllerAdmin {
             @RequestBody @Valid final UpdateEventAdminRequest updateEventAdminRequest
     ) {
         log.info("PATCH request to update eventId={} received.", eventId);
-        return eventService.patchAdminEventById(eventId, updateEventAdminRequest);
+        EventFullDto eventFullDto = eventService.patchAdminEventById(eventId, updateEventAdminRequest);
+        log.info("event = {} was updated.", eventFullDto);
+        return eventFullDto;
     }
 
 }

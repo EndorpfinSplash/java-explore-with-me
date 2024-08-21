@@ -1,12 +1,13 @@
-package ru.practicum.ewm.event;
+package ru.practicum.ewm.event.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.event.EventService;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +33,8 @@ public class EventControllerPublic {
             @RequestParam(value = "sort", required = false) final String sort,
             @RequestParam(value = "from", defaultValue = "0") final Integer from,
             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
-
-//        log.info("client ip: {}", httpServletRequest.getRemoteAddr());
-//        log.info("endpoint path: {}", httpServletRequest.getRequestURI());
-//        log.info("GET httpServletRequest from collection of events.");
-        return eventService.getPublicEvents(
+        log.info("GET request to fetch events was received");
+        List<EventShortDto> publicEvents = eventService.getPublicEvents(
                 httpServletRequest,
                 Optional.ofNullable(text),
                 Optional.ofNullable(categories),
@@ -48,16 +46,18 @@ public class EventControllerPublic {
                 from,
                 size
         );
+        log.info("{} events was received", publicEvents.size());
+        return publicEvents;
     }
 
     @GetMapping("/{id}")
     public EventFullDto getEventById(@PathVariable(value = "id") final Long id,
                                      HttpServletRequest httpServletRequest
     ) {
-        return eventService.getEventById(
-                httpServletRequest,
-                id
-        );
+        log.info("GET request to fetch event was received");
+        EventFullDto eventById = eventService.getEventById(httpServletRequest, id);
+        log.info("{} event was received", eventById);
+        return eventById;
     }
 
 }

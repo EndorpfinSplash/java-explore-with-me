@@ -20,12 +20,16 @@ public class EventCategoryControllerAdmin {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto create(@RequestBody @Valid final NewCategoryDto newCategoryDto) {
-        return eventCategoryService.createEventCategory(newCategoryDto);
+        log.info("POST request to create new category: {} was received", newCategoryDto);
+        CategoryDto eventCategory = eventCategoryService.createEventCategory(newCategoryDto);
+        log.info("{} was created", eventCategory);
+        return eventCategory;
     }
 
     @DeleteMapping("/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable("catId") final Integer eventCategoryId) {
+        log.info("DELETE request to remove category_id = {} was received", eventCategoryId);
         eventCategoryService.deleteEventCategoryById(eventCategoryId);
     }
 
@@ -34,7 +38,9 @@ public class EventCategoryControllerAdmin {
                                     @RequestBody @Valid NewCategoryDto newCategoryDto
     ) {
         log.info("Patch request to update event_category_id={} received.", eventCategoryId);
-        return eventCategoryService.updateEventCategory(eventCategoryId, newCategoryDto);
+        CategoryDto categoryDto = eventCategoryService.updateEventCategory(eventCategoryId, newCategoryDto);
+        log.info("{} was patched", categoryDto);
+        return categoryDto;
     }
 
 }

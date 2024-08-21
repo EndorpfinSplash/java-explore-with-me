@@ -20,12 +20,16 @@ public class CompilationControllerPublic {
                                                 @RequestParam(value = "from", defaultValue = "0") final Integer from,
                                                 @RequestParam(value = "size", defaultValue = "10") final Integer size) {
         log.info("GET request to fetch compilations received.");
-        return compilationService.getCompilations(pinned, from, size);
+        List<CompilationDto> compilations = compilationService.getCompilations(pinned, from, size);
+        log.info("{} compilations fetched.", compilations.size());
+        return compilations;
     }
 
     @GetMapping("/{compId}")
     public CompilationDto getCompilation(@PathVariable(name = "compId") Long compId) {
         log.info("GET request to fetch compilationId={} received.", compId);
-        return compilationService.getCompilation(compId);
+        CompilationDto compilation = compilationService.getCompilation(compId);
+        log.info("{} compilation fetched.", compilation);
+        return compilation;
     }
 }

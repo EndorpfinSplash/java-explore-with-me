@@ -15,12 +15,12 @@ import ru.practicum.commons.EndpointHit;
 import ru.practicum.commons.ViewStats;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event_category.EventCategory;
-import ru.practicum.ewm.event_category.EventCategoryRepository;
+import ru.practicum.ewm.event_category.EventCategoryService;
 import ru.practicum.ewm.exception.*;
 import ru.practicum.ewm.request.*;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.user.User;
-import ru.practicum.ewm.user.UserRepository;
+import ru.practicum.ewm.user.UserService;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -35,16 +35,15 @@ public class EventService {
     public static final String EWM_MAIN_SERVICE_NAME = "ewm-main-service";
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
-    private final EventCategoryRepository eventCategoryRepository;
+    private final UserService userService;
+    private final EventCategoryService eventCategoryService;
     private final RequestRepository requestRepository;
     private final EntityManager entityManager;
 
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId)));
-
+        User user = userService.findUser(userId);
         Long eventCategoryId = Long.valueOf(newEventDto.getCategory());
-        EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(() -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found", eventCategoryId)));
+        EventCategory eventCategory = eventCategoryService.findEventCategory(eventCategoryId);
         if (newEventDto.getEventDate()
                 .minusHours(2L).isBefore(LocalDateTime.now())) {
             throw new EventNotValidArgumentException("Event should be announced 2 hours earlier then event");
@@ -56,9 +55,7 @@ public class EventService {
 
 
     public Collection<EventFullDto> getUserEvents(Long userId, Integer from, Integer size) {
-        userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
-        );
+        userService.findUser(userId);
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
         Map<Long, Long> viewsByEvent = getViewsStatisticMap();
         Map<Long, Long> confirmedRequestsByEvent = getConfirmedRequestsMap();
@@ -80,7 +77,7 @@ public class EventService {
 
         Event eventByUserAndId = eventRepository.findEventByIdAndEventStatus(eventId, EventStatus.PUBLISHED)
                 .orElseThrow(
-                        () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+                        () -> new EntityNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
                 );
         Map<Long, Long> viewsByEvent = getViewsStatisticMap();
         Map<Long, Long> confirmedRequestsByEvent = getConfirmedRequestsMap();
@@ -92,12 +89,8 @@ public class EventService {
     }
 
     public EventFullDto getUserEventById(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
-        );
-        Event eventByUserAndId = eventRepository.findEventByUserAndId(user, eventId).orElseThrow(
-                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
-        );
+        User user = userService.findUser(userId);
+        Event eventByUserAndId = findEventByUserAndId(eventId, user);
 
         Map<Long, Long> viewsByEvent = getViewsStatisticMap();
         Map<Long, Long> confirmedRequestsByEvent = getConfirmedRequestsMap();
@@ -109,13 +102,8 @@ public class EventService {
 
     public EventFullDto patchUserEventById(Long userId, Long eventId, UpdateEventUserRequest updateEventUserRequest) {
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
-        );
-
-        Event eventForUpdate = eventRepository.findEventByUserAndId(user, eventId).orElseThrow(
-                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
-        );
+        User user = userService.findUser(userId);
+        Event eventForUpdate = findEventByUserAndId(eventId, user);
         if (!(eventForUpdate.getEventStatus() == EventStatus.PENDING ||
                 eventForUpdate.getEventStatus() == EventStatus.CANCELED)) {
             throw new NotApplicableEvent("Only pending or canceled events can be changed");
@@ -139,9 +127,7 @@ public class EventService {
 
         Long eventCategoryId = updateEventUserRequest.getCategory();
         if (eventCategoryId != null) {
-            EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(
-                    () -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found", eventCategoryId))
-            );
+            EventCategory eventCategory =eventCategoryService.findEventCategory(eventCategoryId);
             eventForUpdate.setCategory(eventCategory);
         }
 
@@ -173,12 +159,8 @@ public class EventService {
     }
 
     public List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
-        );
-        eventRepository.findEventByUserAndId(user, eventId).orElseThrow(
-                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
-        );
+        User user = userService.findUser(userId);
+        findEventByUserAndId(eventId, user);
 
         return requestRepository.findRequestByEventId(eventId).stream()
                 .map(RequestMapper::requestToParticipationRequestDto)
@@ -195,13 +177,8 @@ public class EventService {
             throw new IncorrectStatusException("Incorrect request status");
         }
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
-        );
-
-        Event event = eventRepository.findEventByUserAndId(user, eventId).orElseThrow(
-                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
-        );
+        User user = userService.findUser(userId);
+        Event event = findEventByUserAndId(eventId, user);
 
         if (event.getParticipantLimit() == 0 || !event.isRequestModeration()) {
             throw new ParticipantsLimitationException("This event's requests shouldn't be confirmed");
@@ -234,7 +211,7 @@ public class EventService {
         List<ParticipationRequestDto> result = new ArrayList<>();
         eventRequestStatusUpdateRequest.getRequestIds().forEach(requestId -> {
             Request request = requestRepository.findById(requestId).orElseThrow(
-                    () -> new RequestNotFoundException(
+                    () -> new EntityNotFoundException(
                             MessageFormat.format("Request with id={0} was not found", requestId)
                     )
             );
@@ -410,7 +387,7 @@ public class EventService {
 
     public EventFullDto patchAdminEventById(Long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
         Event eventForUpdate = eventRepository.findById(eventId).orElseThrow(
-                () -> new EventNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+                () -> new EntityNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
         );
 
         if (updateEventAdminRequest.getEventDate() != null &&
@@ -449,7 +426,7 @@ public class EventService {
 
         Long eventCategoryId = updateEventAdminRequest.getCategory();
         if (eventCategoryId != null) {
-            EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(() -> new EventCategoryNotFoundException(MessageFormat.format("Category with id={0} was not found", eventCategoryId)));
+            EventCategory eventCategory = eventCategoryService.findEventCategory(eventCategoryId);
             eventForUpdate.setCategory(eventCategory);
         }
         if (updateEventAdminRequest.getAnnotation() != null) {
@@ -506,5 +483,11 @@ public class EventService {
                         }, ViewStats::getHits),
                         resultMap -> resultMap.isEmpty() ? Map.of(0L, 0L) : resultMap)
                 );
+    }
+
+    private Event findEventByUserAndId(Long eventId, User user) {
+        return eventRepository.findEventByUserAndId(user, eventId).orElseThrow(
+                () -> new EntityNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
+        );
     }
 }

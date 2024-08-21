@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.exception.UserNotFoundException;
+import ru.practicum.ewm.exception.EntityNotFoundException;
 import ru.practicum.ewm.user.dto.NewUserRequest;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.dto.UserUpdateDto;
@@ -33,20 +33,22 @@ public class UserService {
     }
 
     public UserDto updateUser(Long userId, UserUpdateDto userUpdateDto) {
-        User userForUpdate = userStorage.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(MessageFormat.format("User with userId={0} not found", userId))
-        );
+        User userForUpdate = findUser(userId);
         User editedUser = UserMapper.toUser(userForUpdate, userUpdateDto);
         User updatedUser = userStorage.save(editedUser);
         return UserMapper.toUserOutputDto(updatedUser);
     }
 
     public UserDto getUserById(Long userId) {
-        User user = userStorage.findById(userId)
-                .orElseThrow(
-                        () -> new UserNotFoundException(MessageFormat.format("User with userId={0} was not found", userId))
-                );
+        User user = findUser(userId);
         return UserMapper.toUserOutputDto(user);
+    }
+
+    public User findUser(Long userId) {
+        return userStorage.findById(userId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException(MessageFormat.format("User with userId={0} was not found", userId))
+                );
     }
 
     public void deleteUserById(Long id) {

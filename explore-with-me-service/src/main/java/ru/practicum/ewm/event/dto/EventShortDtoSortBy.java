@@ -1,9 +1,8 @@
-package ru.practicum.ewm.event;
+package ru.practicum.ewm.event.dto;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import ru.practicum.ewm.event.dto.EventShortDto;
 
 import java.util.Comparator;
 
