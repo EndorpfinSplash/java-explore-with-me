@@ -127,7 +127,7 @@ public class EventService {
 
         Long eventCategoryId = updateEventUserRequest.getCategory();
         if (eventCategoryId != null) {
-            EventCategory eventCategory =eventCategoryService.findEventCategory(eventCategoryId);
+            EventCategory eventCategory = eventCategoryService.findEventCategory(eventCategoryId);
             eventForUpdate.setCategory(eventCategory);
         }
 
