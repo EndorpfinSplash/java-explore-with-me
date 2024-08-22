@@ -1,5 +1,4 @@
-drop table if exists EVENT;
-
+-- drop table if exists EVENT;
 
 CREATE TABLE IF NOT EXISTS EVENT
 (
@@ -8,5 +7,5 @@ CREATE TABLE IF NOT EXISTS EVENT
     uri     varchar(1024),
     ip      varchar(1024),
     created TIMESTAMP WITHOUT TIME ZONE
-)
+);
 

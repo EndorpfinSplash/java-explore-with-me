@@ -1,50 +1,68 @@
 package ru.practicum;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import ru.practicum.commons.EventCreationDto;
+import org.springframework.web.util.UriComponentsBuilder;
+import ru.practicum.commons.EndpointHit;
 import ru.practicum.commons.EventOutDto;
-import ru.practicum.commons.EventStatisticOutDto;
+import ru.practicum.commons.ViewStats;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
+@Component
 public class StatisticRestClient {
 
     private static final String RESOURCE_PATH_TO_SAVE_EVENT = "/hit";
     private static final String RESOURCE_PATH_TO_GET_STATISTIC = "/stats";
+    private static final String HOST = "stat-service";
+    private static final int PORT = 9090;
 
-    @Value("${server.port}")
-    private int port;
+    private static final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${host}")
-    private String host;
-
-    private final RestTemplate restTemplate = new RestTemplate();
-
-    public EventOutDto sendData(EventCreationDto eventCreationDto) {
-        String requestUri = host + ":" + port + RESOURCE_PATH_TO_SAVE_EVENT;
+    public static EventOutDto sendData(EndpointHit endpointHit) {
+        String requestUri = "http://" + HOST + ":" + PORT + RESOURCE_PATH_TO_SAVE_EVENT;
         return restTemplate.postForEntity(requestUri,
-                        eventCreationDto,
+                        endpointHit,
                         EventOutDto.class)
                 .getBody();
     }
 
-    public List<EventStatisticOutDto> getData(String start, String end, String uris, String unique) {
-        String requestUri = host + ":" + port + RESOURCE_PATH_TO_GET_STATISTIC;
+    public static List<ViewStats> getData(String start, String end, List<String> uris, String unique) {
+        String requestUri = "http://" + HOST + ":" + PORT + RESOURCE_PATH_TO_GET_STATISTIC;
 
-        Map<String, String> urlParameters = new HashMap<>();
-        urlParameters.put("start", start);
-        urlParameters.put("end", end);
-        urlParameters.put("uris", uris);
-        urlParameters.put("unique", unique);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
 
-        ResponseEntity<EventStatisticOutDto[]> events = restTemplate.getForEntity(requestUri,
-                EventStatisticOutDto[].class,
-                urlParameters);
-        return events.getBody() != null ? Arrays.asList(events.getBody()) :
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(requestUri)
+                .queryParam("start", start)
+                .queryParam("end", end);
+
+        if (uris != null && !uris.isEmpty()) {
+            uriComponentsBuilder.queryParam("uris", String.join(",", uris));
+        }
+        if (unique != null && !unique.isEmpty()) {
+            uriComponentsBuilder.queryParam("unique", unique);
+        }
+
+        String urlTemplate = uriComponentsBuilder.encode().toUriString();
+
+        HttpEntity<ViewStats[]> response = restTemplate.exchange(
+                urlTemplate,
+                HttpMethod.GET,
+                entity,
+                ViewStats[].class
+        );
+
+        return response.getBody() != null ? List.of(response.getBody()) :
                 Collections.emptyList();
     }
 
