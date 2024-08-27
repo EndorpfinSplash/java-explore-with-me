@@ -17,6 +17,7 @@ import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event_category.EventCategory;
 import ru.practicum.ewm.event_category.EventCategoryService;
 import ru.practicum.ewm.exception.*;
+import ru.practicum.ewm.location.LocationRepository;
 import ru.practicum.ewm.request.*;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.user.User;
@@ -34,11 +35,13 @@ public class EventService {
 
     public static final String EWM_MAIN_SERVICE_NAME = "ewm-main-service";
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     private final EventRepository eventRepository;
     private final UserService userService;
     private final EventCategoryService eventCategoryService;
     private final RequestRepository requestRepository;
     private final EntityManager entityManager;
+    private final LocationRepository locationRepository;
 
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         User user = userService.findUser(userId);
@@ -228,6 +231,7 @@ public class EventService {
     }
 
     public List<EventShortDto> getPublicEvents(HttpServletRequest httpServletRequest,
+                                               Optional<Long> locationId,
                                                Optional<String> text,
                                                Optional<List<Integer>> categories,
                                                Optional<Boolean> paid,
@@ -244,7 +248,54 @@ public class EventService {
                 .build();
         StatisticRestClient.sendData(endpointHit);
 
+        List<Event> events = getEvents(text, categories, paid, rangeStart, rangeEnd);
+
+        if (locationId.isPresent()) {
+            List<Event> eventsInLocation = eventRepository.getEventsInLocationByLocationId(locationId.get());
+            events = events.stream()
+                    .filter(eventsInLocation::contains)
+                    .toList();
+        }
+
+        Map<Long, Long> viewsByEvent = getViewsStatisticMap();
+        Map<Long, Long> confirmedRequestsByEvent = getConfirmedRequestsMap();
+
+        List<EventShortDto> eventShortDtoList = events.stream()
+                .filter(currentEvent -> {
+                    if (onlyAvailable && currentEvent.getParticipantLimit() -
+                            confirmedRequestsByEvent.getOrDefault(currentEvent.getId(), 0L) > 0) {
+                        return true;
+                    }
+                    return true;
+                })
+                .map(eventEntity -> EventMapper.eventToShortDto(eventEntity,
+                                viewsByEvent.getOrDefault(eventEntity.getId(), 0L),
+                                confirmedRequestsByEvent.getOrDefault(eventEntity.getId(), 0L)
+                        )
+                )
+                .collect(Collectors.toList());
+
+        if (sort.isPresent()) {
+            try {
+                EventShortDtoSortBy eventShortDtoSortBy = EventShortDtoSortBy.valueOf(sort.get());
+                eventShortDtoList = eventShortDtoList.stream().sorted(eventShortDtoSortBy.getComparator()).collect(Collectors.toList());
+            } catch (IllegalArgumentException e) {
+                throw new EventSortOrderNotValidException("Not valid event sorting order");
+            }
+        }
+
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
+
+        return eventShortDtoList.subList((int) page.getOffset(),
+                Math.min(page.getPageSize(), eventShortDtoList.size())
+        );
+    }
+
+    private List<Event> getEvents(Optional<String> text,
+                                  Optional<List<Integer>> categories,
+                                  Optional<Boolean> paid,
+                                  Optional<String> rangeStart,
+                                  Optional<String> rangeEnd) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> query = cb.createQuery(Event.class);
         Root<Event> event = query.from(Event.class);
@@ -288,48 +339,48 @@ public class EventService {
 
         query.where(predicates.toArray(new Predicate[0]));
 
-        List<Event> eventsList = entityManager.createQuery(query)
-                .getResultList();
-
-        Map<Long, Long> viewsByEvent = getViewsStatisticMap();
-        Map<Long, Long> confirmedRequestsByEvent = getConfirmedRequestsMap();
-
-        List<EventShortDto> eventShortDtoList = eventsList.stream()
-                .filter(currentEvent -> {
-                    if (onlyAvailable && currentEvent.getParticipantLimit() -
-                            confirmedRequestsByEvent.getOrDefault(currentEvent.getId(), 0L) > 0) {
-                        return true;
-                    }
-                    return true;
-                })
-                .map(eventEntity -> EventMapper.eventToShortDto(eventEntity,
-                                viewsByEvent.getOrDefault(eventEntity.getId(), 0L),
-                                confirmedRequestsByEvent.getOrDefault(eventEntity.getId(), 0L)
-                        )
-                )
-                .collect(Collectors.toList());
-
-        if (sort.isPresent()) {
-            try {
-                EventShortDtoSortBy eventShortDtoSortBy = EventShortDtoSortBy.valueOf(sort.get());
-                eventShortDtoList = eventShortDtoList.stream().sorted(eventShortDtoSortBy.getComparator()).collect(Collectors.toList());
-            } catch (IllegalArgumentException e) {
-                throw new EventSortOrderNotValidException("Not valid event sorting order");
-            }
-        }
-        return eventShortDtoList.subList((int) page.getOffset(),
-                Math.min(page.getPageSize(), eventShortDtoList.size())
-        );
+        List<Event> eventsList = entityManager.createQuery(query).getResultList();
+        return eventsList;
     }
 
-    public Collection<EventFullDto> getAdminEvents(Optional<List<Integer>> users,
+    public Collection<EventFullDto> getAdminEvents(Optional<Long> locationId,
+                                                   Optional<List<Integer>> users,
                                                    Optional<List<String>> states,
                                                    Optional<List<Integer>> categories,
                                                    Optional<String> rangeStart,
                                                    Optional<String> rangeEnd,
                                                    Integer from,
                                                    Integer size) {
+
+        List<Event> events = getEventList(users, states, categories, rangeStart, rangeEnd);
+
+        if (locationId.isPresent()) {
+            List<Event> eventsInLocation = eventRepository.getEventsInLocationByLocationId(locationId.get());
+            events = events.stream()
+                    .filter(eventsInLocation::contains)
+                    .toList();
+        }
+
+        Map<Long, Long> confirmedRequestsByEvent = getConfirmedRequestsMap();
+        Map<Long, Long> viewsByEvent = getViewsStatisticMap();
+
+        List<EventFullDto> eventFullDtoList = events.stream()
+                .map(
+                        eventEntity -> EventMapper.eventToFullDto(
+                                eventEntity,
+                                viewsByEvent.getOrDefault(eventEntity.getId(), 0L),
+                                confirmedRequestsByEvent.getOrDefault(eventEntity.getId(), 0L)
+                        )
+                )
+                .collect(Collectors.toList());
+
         Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
+        return eventFullDtoList.subList((int) page.getOffset(),
+                Math.min(page.getPageSize(), eventFullDtoList.size())
+        );
+    }
+
+    private List<Event> getEventList(Optional<List<Integer>> users, Optional<List<String>> states, Optional<List<Integer>> categories, Optional<String> rangeStart, Optional<String> rangeEnd) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> query = cb.createQuery(Event.class);
         Root<Event> event = query.from(Event.class);
@@ -366,23 +417,7 @@ public class EventService {
         query.where(predicates.toArray(new Predicate[0]));
 
         List<Event> eventsList = entityManager.createQuery(query).getResultList();
-
-        Map<Long, Long> confirmedRequestsByEvent = getConfirmedRequestsMap();
-        Map<Long, Long> viewsByEvent = getViewsStatisticMap();
-
-        List<EventFullDto> eventFullDtoList = eventsList.stream()
-                .map(
-                        eventEntity -> EventMapper.eventToFullDto(
-                                eventEntity,
-                                viewsByEvent.getOrDefault(eventEntity.getId(), 0L),
-                                confirmedRequestsByEvent.getOrDefault(eventEntity.getId(), 0L)
-                        )
-                )
-                .collect(Collectors.toList());
-
-        return eventFullDtoList.subList((int) page.getOffset(),
-                Math.min(page.getPageSize(), eventFullDtoList.size())
-        );
+        return eventsList;
     }
 
     public EventFullDto patchAdminEventById(Long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
@@ -456,7 +491,7 @@ public class EventService {
         return EventMapper.eventToFullDto(savedEvent, 0L, 0L);
     }
 
-    public Map<Long, Long> getConfirmedRequestsMap() {
+    private Map<Long, Long> getConfirmedRequestsMap() {
         Map<Long, Long> confirmedRequestsByEvent = requestRepository.countRequestByEventId(RequestStatus.CONFIRMED)
                 .stream()
                 .collect(Collectors.collectingAndThen(
@@ -466,7 +501,7 @@ public class EventService {
         return confirmedRequestsByEvent;
     }
 
-    public static Map<Long, Long> getViewsStatisticMap() {
+    private static Map<Long, Long> getViewsStatisticMap() {
         List<ViewStats> viewStats = StatisticRestClient.getData(
                 LocalDateTime.of(0, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),
                 LocalDateTime.of(5000, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),
@@ -490,4 +525,5 @@ public class EventService {
                 () -> new EntityNotFoundException(MessageFormat.format("Event with id={0} was not found", eventId))
         );
     }
+
 }

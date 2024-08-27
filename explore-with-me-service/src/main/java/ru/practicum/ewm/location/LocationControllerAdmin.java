@@ -3,28 +3,12 @@ package ru.practicum.ewm.location;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.ewm.event.Event;
-import ru.practicum.ewm.event.EventMapper;
-import ru.practicum.ewm.event.EventRepository;
-import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.exception.EntityNotFoundException;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.location.dto.LocationFullDto;
 import ru.practicum.ewm.location.dto.NewLocationDto;
 import ru.practicum.ewm.location.dto.UpdateLocationDto;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static ru.practicum.ewm.event.EventService.getViewsStatisticMap;
 
 @RestController
 @RequestMapping("/admin/locations")
@@ -33,8 +17,6 @@ import static ru.practicum.ewm.event.EventService.getViewsStatisticMap;
 public class LocationControllerAdmin {
 
     private final LocationService locationService;
-    private final LocationRepository locationRepository;
-    private final EventRepository eventRepository;
 
     @GetMapping
     public List<LocationFullDto> getAdminAllLocations() {
@@ -73,22 +55,6 @@ public class LocationControllerAdmin {
     public void delete(@PathVariable Long id) {
         log.info("DELETE request to remove Location_id {} received", id);
         locationService.delete(id);
-    }
-
-
-    @GetMapping("/{id}/events")
-    public List<EventFullDto> getAdminLocationEventsById(@PathVariable Long id) {
-        locationRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Location not found")
-        );
-        List<Event> allLocationEventsById = eventRepository.getAllLocationEventsById(id);
-        Map<Long, Long> viewsByEvent = getViewsStatisticMap();
-        return allLocationEventsById.stream()
-                .map(
-                        event -> EventMapper.eventToFullDto(event, viewsByEvent.getOrDefault(event.getId(), 0L),
-                                0L)
-                )
-                .collect(Collectors.toList());
     }
 
 }

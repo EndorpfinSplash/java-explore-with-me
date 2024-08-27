@@ -3,10 +3,6 @@ package ru.practicum.ewm.location;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.event.Event;
-import ru.practicum.ewm.event.EventMapper;
-import ru.practicum.ewm.event.EventService;
-import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.exception.EntityNotFoundException;
 import ru.practicum.ewm.location.dto.LocationFullDto;
 import ru.practicum.ewm.location.dto.LocationShortDto;
@@ -14,18 +10,14 @@ import ru.practicum.ewm.location.dto.NewLocationDto;
 import ru.practicum.ewm.location.dto.UpdateLocationDto;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static ru.practicum.ewm.event.EventService.getViewsStatisticMap;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class LocationService {
     private final LocationRepository locationRepository;
-    private final EventService eventService;
 
     public LocationFullDto createLocation(NewLocationDto newLocationDto) {
         Location locationForSave = LocationMapper.newLocationToEntity(newLocationDto);
@@ -90,30 +82,6 @@ public class LocationService {
                 () -> new EntityNotFoundException("Location not found")
         );
     }
-
-    public List<EventShortDto> findPublicLocationEventsById(Long id) {
-        getLocationById(id);
-
-        locationRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Location not found")
-        );
-        List<Event> locationEventsById = eventRepository.getLocationEventsById(id);
-        Map<Long, Long> viewsByEvent = getViewsStatisticMap();
-//        Map<Long, Long> confirmedRequestsByEvent = getConfirmedRequestsMap();
-
-        List<EventShortDto> eventShortDtoList = locationEventsById.stream()
-                .map(eventEntity -> EventMapper.eventToShortDto(eventEntity,
-                                viewsByEvent.getOrDefault(eventEntity.getId(), 0L),
-//                                confirmedRequestsByEvent.getOrDefault(eventEntity.getId(), 0L)
-                                0L
-                        )
-                )
-                .collect(Collectors.toList());
-
-//        eventService.getPublicEvents()
-        return null;
-    }
-
 
 
     public List<LocationFullDto> getAdminAllLocations() {

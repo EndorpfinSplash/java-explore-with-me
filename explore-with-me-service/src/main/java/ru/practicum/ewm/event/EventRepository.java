@@ -19,16 +19,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query(value =
             "SELECT t.* " +
-                    "FROM event t cross join (select * from location where id = :id) l " +
-                    "where l.radius - distance(l.location_lat, l.location_lon, t.location_lat, t.location_lon) > 0 "+
-                    "and t.status = 'PENDING' "
-            , nativeQuery = true)
-    List<Event> getLocationEventsById(Long id);
-
-    @Query(value =
-            "SELECT t.* " +
-                    "FROM event t cross join (select * from location where id = :id) l " +
+                    "FROM event t cross join (select * from location where id = :locationId) l " +
                     "where l.radius - distance(l.location_lat, l.location_lon, t.location_lat, t.location_lon) > 0 "
             , nativeQuery = true)
-    List<Event> getAllLocationEventsById(Long id);
+    List<Event> getEventsInLocationByLocationId(Long locationId);
 }

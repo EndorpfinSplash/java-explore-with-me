@@ -36,6 +36,7 @@ public class EventControllerPublic {
         log.info("GET request to fetch events was received");
         List<EventShortDto> publicEvents = eventService.getPublicEvents(
                 httpServletRequest,
+                Optional.empty(),
                 Optional.ofNullable(text),
                 Optional.ofNullable(categories),
                 Optional.ofNullable(paid),
@@ -48,6 +49,37 @@ public class EventControllerPublic {
         );
         log.info("{} events was received", publicEvents.size());
         return publicEvents;
+    }
+
+    @GetMapping("/in-location/{locationId}")
+    public Collection<EventShortDto> getEventsForLocation(
+            HttpServletRequest httpServletRequest,
+            @PathVariable(name = "locationId") final Long locationId,
+            @RequestParam(value = "text", required = false) final String text,
+            @RequestParam(value = "categories", required = false) final List<Integer> categories,
+            @RequestParam(value = "paid", required = false) final Boolean paid,
+            @RequestParam(value = "rangeStart", required = false) final String rangeStart,
+            @RequestParam(value = "rangeEnd", required = false) final String rangeEnd,
+            @RequestParam(value = "onlyAvailable", defaultValue = "false") final boolean onlyAvailable,
+            @RequestParam(value = "sort", required = false) final String sort,
+            @RequestParam(value = "from", defaultValue = "0") final Integer from,
+            @RequestParam(value = "size", defaultValue = "10") final Integer size) {
+        log.info("GET request to fetch events for location_id = {} was received", locationId);
+        List<EventShortDto> locationEvents = eventService.getPublicEvents(
+                httpServletRequest,
+                Optional.ofNullable(locationId),
+                Optional.ofNullable(text),
+                Optional.ofNullable(categories),
+                Optional.ofNullable(paid),
+                Optional.ofNullable(rangeStart),
+                Optional.ofNullable(rangeEnd),
+                onlyAvailable,
+                Optional.ofNullable(sort),
+                from,
+                size
+        );
+        log.info("{} events in location was received", locationEvents.size());
+        return locationEvents;
     }
 
     @GetMapping("/{id}")
