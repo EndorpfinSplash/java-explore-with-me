@@ -39,7 +39,6 @@ public class Location {
     @Column(name = "RADIUS")
     private double radius;
 
-
     @Builder.Default
     @Column(name = "CREATED_ON")
     private LocalDateTime createdOn = LocalDateTime.now();

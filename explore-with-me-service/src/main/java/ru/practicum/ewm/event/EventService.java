@@ -456,7 +456,7 @@ public class EventService {
         return EventMapper.eventToFullDto(savedEvent, 0L, 0L);
     }
 
-    private Map<Long, Long> getConfirmedRequestsMap() {
+    public Map<Long, Long> getConfirmedRequestsMap() {
         Map<Long, Long> confirmedRequestsByEvent = requestRepository.countRequestByEventId(RequestStatus.CONFIRMED)
                 .stream()
                 .collect(Collectors.collectingAndThen(
@@ -466,7 +466,7 @@ public class EventService {
         return confirmedRequestsByEvent;
     }
 
-    private static Map<Long, Long> getViewsStatisticMap() {
+    public static Map<Long, Long> getViewsStatisticMap() {
         List<ViewStats> viewStats = StatisticRestClient.getData(
                 LocalDateTime.of(0, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),
                 LocalDateTime.of(5000, 1, 1, 0, 0).format(DATE_TIME_FORMATTER),
