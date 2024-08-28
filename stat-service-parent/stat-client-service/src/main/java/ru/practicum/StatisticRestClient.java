@@ -21,8 +21,8 @@ public class StatisticRestClient {
 
     private static final String RESOURCE_PATH_TO_SAVE_EVENT = "/hit";
     private static final String RESOURCE_PATH_TO_GET_STATISTIC = "/stats";
-//    private static final String HOST = "stat-service";
-    private static final String HOST = "localhost";
+    private static final String HOST = "stat-service";
+//    private static final String HOST = "localhost";
     private static final int PORT = 9090;
 
     private static final RestTemplate restTemplate = new RestTemplate();
