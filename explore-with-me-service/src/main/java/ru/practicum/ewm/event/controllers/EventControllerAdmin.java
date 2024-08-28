@@ -32,6 +32,7 @@ public class EventControllerAdmin {
             @RequestParam(value = "size", defaultValue = "10") final Integer size) {
         log.info("GET request to fetch list of events received.");
         Collection<EventFullDto> adminEvents = eventService.getAdminEvents(
+                Optional.empty(),
                 Optional.ofNullable(users),
                 Optional.ofNullable(states),
                 Optional.ofNullable(categories),
@@ -41,6 +42,31 @@ public class EventControllerAdmin {
                 size
         );
         log.info("{} events were fetched.", adminEvents.size());
+        return adminEvents;
+    }
+
+    @GetMapping("/in-location/{locationId}")
+    public Collection<EventFullDto> getAdminEventsInLocation(
+            @PathVariable(name = "locationId") final Long locationId,
+            @RequestParam(value = "users", required = false) final List<Integer> users,
+            @RequestParam(value = "states", required = false) final List<String> states,
+            @RequestParam(value = "categories", required = false) final List<Integer> categories,
+            @RequestParam(value = "rangeStart", required = false) final String rangeStart,
+            @RequestParam(value = "rangeEnd", required = false) final String rangeEnd,
+            @RequestParam(value = "from", defaultValue = "0") final Integer from,
+            @RequestParam(value = "size", defaultValue = "10") final Integer size) {
+        log.info("GET request to fetch list of events in location_id = {} received.",locationId);
+        Collection<EventFullDto> adminEvents = eventService.getAdminEvents(
+                Optional.ofNullable(locationId),
+                Optional.ofNullable(users),
+                Optional.ofNullable(states),
+                Optional.ofNullable(categories),
+                Optional.ofNullable(rangeStart),
+                Optional.ofNullable(rangeEnd),
+                from,
+                size
+        );
+        log.info("{} events in location were fetched.", adminEvents.size());
         return adminEvents;
     }
 

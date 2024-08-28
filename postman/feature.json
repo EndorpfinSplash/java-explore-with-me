@@ -1,0 +1,954 @@
+{
+	"info": {
+		"_postman_id": "b2f2b7ba-45c6-4e54-87a0-0d6ea800ada7",
+		"name": "Locations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13168251"
+	},
+	"item": [
+		{
+			"name": "Locations Admin",
+			"item": [
+				{
+					"name": "Create location",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const target = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Локация должна содержать поля: id, name, description, locationLat, locationLon, radius, createdOn\", function () {\r",
+									"pm.expect(target).to.have.property('id');\r",
+									"pm.expect(target).to.have.property('name');\r",
+									"pm.expect(target).to.have.property('description');\r",
+									"pm.expect(target).to.have.property('locationLat');\r",
+									"pm.expect(target).to.have.property('locationLon');\r",
+									"pm.expect(target).to.have.property('radius');\r",
+									"pm.expect(target).to.have.property('createdOn');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+									"    pm.expect(target.id).to.be.gte(0);\r",
+									"    pm.expect(source.name).equal(target.name, 'Имя локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.description).equal(target.description, 'Описание локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.locationLat).equal(target.locationLat, 'Долгота локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.locationLon).equal(target.locationLon, 'Широта локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.radius).equal(target.radius, 'Радиус локации должно соответствовать отправленному в запросе');\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Location 1\",\r\n    \"description\": \"Loc description 1\",\r\n    \"locationLat\": 11,\r\n    \"locationLon\": 19,\r\n    \"radius\": 111111\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create location 2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const target = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Локация должна содержать поля: id, name, description, locationLat, locationLon, radius, createdOn\", function () {\r",
+									"pm.expect(target).to.have.property('id');\r",
+									"pm.expect(target).to.have.property('name');\r",
+									"pm.expect(target).to.have.property('description');\r",
+									"pm.expect(target).to.have.property('locationLat');\r",
+									"pm.expect(target).to.have.property('locationLon');\r",
+									"pm.expect(target).to.have.property('radius');\r",
+									"pm.expect(target).to.have.property('createdOn');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+									"    pm.expect(target.id).to.be.gte(0);\r",
+									"    pm.expect(source.name).equal(target.name, 'Имя локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.description).equal(target.description, 'Описание локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.locationLat).equal(target.locationLat, 'Долгота локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.locationLon).equal(target.locationLon, 'Широта локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.radius).equal(target.radius, 'Радиус локации должно соответствовать отправленному в запросе');\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Location 2\",\r\n    \"description\": \"Loc description 2\",\r\n    \"locationLat\": 22,\r\n    \"locationLon\": 22,\r\n    \"radius\": 22222\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all locations for admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const body = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тело ответа должно быть массивом и количество элементов больше 0\", function() {\r",
+									"    pm.expect(body).is.an('array');\r",
+									"    pm.expect(body.length).to.be.gte(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Локация должна содержать поля: id, name, description, locationLat, locationLon, radius, createdOn , createdOn\", function () {\r",
+									"    pm.expect(body[0]).to.have.property('id');\r",
+									"    pm.expect(body[0]).to.have.property('name');\r",
+									"    pm.expect(body[0]).to.have.property('description');\r",
+									"    pm.expect(body[0]).to.have.property('locationLat');\r",
+									"    pm.expect(body[0]).to.have.property('locationLon');   \r",
+									"    pm.expect(body[0]).to.have.property('radius'); \r",
+									"    pm.expect(body[0]).to.have.property('createdOn');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get location by id for admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const target = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Локация должна содержать поля: id, name, description, locationLat, locationLon, radius, createdOn\", function () {\r",
+									"pm.expect(target).to.have.property('id');\r",
+									"pm.expect(target).to.have.property('name');\r",
+									"pm.expect(target).to.have.property('description');\r",
+									"pm.expect(target).to.have.property('locationLat');\r",
+									"pm.expect(target).to.have.property('locationLon');\r",
+									"pm.expect(target).to.have.property('radius');\r",
+									"pm.expect(target).to.have.property('createdOn');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update location",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const target = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Локация должна содержать поля: id, name, description, locationLat, locationLon, radius, createdOn\", function () {\r",
+									"pm.expect(target).to.have.property('id');\r",
+									"pm.expect(target).to.have.property('name');\r",
+									"pm.expect(target).to.have.property('description');\r",
+									"pm.expect(target).to.have.property('locationLat');\r",
+									"pm.expect(target).to.have.property('locationLon');\r",
+									"pm.expect(target).to.have.property('radius');\r",
+									"pm.expect(target).to.have.property('createdOn');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+									"    pm.expect(target.id).to.be.gte(0);\r",
+									"    pm.expect(source.name).equal(target.name, 'Имя локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.description).equal(target.description, 'Описание локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.locationLat).equal(target.locationLat, 'Долгота локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.locationLon).equal(target.locationLon, 'Широта локации должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.radius).equal(target.radius, 'Радиус локации должно соответствовать отправленному в запросе');\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Location updated\",\r\n    \"description\": \"Loc description 1\",\r\n    \"locationLat\": 11.22,\r\n    \"locationLon\": -1.9,\r\n    \"radius\": 555555.675\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 2xx и данные в формате json\", function () {\r",
+							"    pm.response.to.success;\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Locations Public",
+			"item": [
+				{
+					"name": "Get all locations for public",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const body = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тело ответа должно быть массивом и количество элементов больше 0\", function() {\r",
+									"    pm.expect(body).is.an('array');\r",
+									"     pm.expect(body.length).to.be.gte(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Локация должна содержать поля: id, createdOn\", function () {\r",
+									"    pm.expect(body[0]).to.have.property('name');\r",
+									"    pm.expect(body[0]).to.have.property('description');\r",
+									"    pm.expect(body[0]).to.have.property('locationLat');\r",
+									"    pm.expect(body[0]).to.have.property('locationLon');   \r",
+									"    pm.expect(body[0]).to.have.property('radius'); \r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get location by id for public",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const target = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Локация должна содержать поля: name, description, locationLat, locationLon, radius\", function () {\r",
+									"pm.expect(target).to.have.property('name');\r",
+									"pm.expect(target).to.have.property('description');\r",
+									"pm.expect(target).to.have.property('locationLat');\r",
+									"pm.expect(target).to.have.property('locationLon');\r",
+									"pm.expect(target).to.have.property('radius');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/locations/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"locations",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Locations Not Found Requests",
+			"item": [
+				{
+					"name": "Get location by id for admin not existed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations/0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get location by id for public not existed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/locations/0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"locations",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete non existed location",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations/0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations",
+								"0"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Locations Bad Requests",
+			"item": [
+				{
+					"name": "Location bad latitude",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Location 1\",\r\n    \"description\": \"Loc description 1\",\r\n    \"locationLat\": 111,\r\n    \"locationLon\": 19,\r\n    \"radius\": 111111\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Location bad longitude",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Location bad lon\",\r\n    \"description\": \"Loc description bad lon\",\r\n    \"locationLat\": 44,\r\n    \"locationLon\": -181,\r\n    \"radius\": 111111\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Location blank name",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"\",\r\n    \"description\": \"Loc description bad lon\",\r\n    \"locationLat\": 44,\r\n    \"locationLon\": -181,\r\n    \"radius\": 111111\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update location Bad Latitude",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Location updated\",\r\n    \"description\": \"Loc description 1\",\r\n    \"locationLat\": 111.22,\r\n    \"locationLon\": -1.9,\r\n    \"radius\": 555555.675\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/locations/5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"locations",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Events in Location",
+			"item": [
+				{
+					"name": "Events in Location for Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+									"    pm.response.to.be.ok;    \r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"const source = pm.collectionVariables.get('response');\r",
+									"const target = pm.response.json()[0];\r",
+									"\r",
+									"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, views, confirmedRequests, description, participantLimit, state, createdOn, publishedOn, location, requestModeration\", function () {\r",
+									"pm.expect(target).to.have.property('id');\r",
+									"pm.expect(target).to.have.property('title');\r",
+									"pm.expect(target).to.have.property('annotation');\r",
+									"pm.expect(target).to.have.property('category');\r",
+									"pm.expect(target).to.have.property('paid');\r",
+									"pm.expect(target).to.have.property('eventDate');\r",
+									"pm.expect(target).to.have.property('initiator');\r",
+									"pm.expect(target).to.have.property('views');\r",
+									"pm.expect(target).to.have.property('confirmedRequests');\r",
+									"pm.expect(target).to.have.property('description');\r",
+									"pm.expect(target).to.have.property('participantLimit');\r",
+									"pm.expect(target).to.have.property('state');\r",
+									"pm.expect(target).to.have.property('createdOn');\r",
+									"pm.expect(target).to.have.property('publishedOn');\r",
+									"pm.expect(target).to.have.property('location');\r",
+									"pm.expect(target).to.have.property('requestModeration');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/events/in-location/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"events",
+								"in-location",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Events in Location for Public",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+									"    pm.response.to.be.ok;    \r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"const target = pm.response.json()[0];\r",
+									"\r",
+									"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate\", function () {\r",
+									"    pm.expect(target).to.contain.keys('id', 'title', 'annotation', 'category', 'paid', 'eventDate');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events/in-location/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events",
+								"in-location",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Events in non existed Location",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и массив в формате json\", function () {\r",
+									"    pm.expect(pm.response.json()).is.an('array');\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events/in-location/0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events",
+								"in-location",
+								"0"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create location Conflict",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 409 и данные в формате json\", function () {\r",
+							"    pm.response.to.have.status(409);\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Test Location 2\",\r\n    \"description\": \"Loc description 1\",\r\n    \"locationLat\": 11,\r\n    \"locationLon\": 19,\r\n    \"radius\": 111111\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/admin/locations",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"admin",
+						"locations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete location for admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							" pm.test(\"Ответ должен содержать код статуса 204 и данные в формате json\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/admin/locations/2",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"admin",
+						"locations",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
